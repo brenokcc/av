@@ -49,7 +49,7 @@ class Fabricante(models.Model):
 
 class MarcaManager(models.Manager):
     def all(self):
-        return self.lookups(ADM)
+        return self.lookups(ADM).search('nome', 'fabricante__nome')
 
 
 class Marca(models.Model):
