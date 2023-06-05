@@ -26,13 +26,82 @@ class Administrador(models.Model):
         return user.is_superuser
 
 
+class FabricanteManager(models.Manager):
+    def all(self):
+        return self.lookups(ADM)
+
+
+class Fabricante(models.Model):
+    nome = models.CharField('Nome')
+
+    objects = FabricanteManager()
+
+    class Meta:
+        verbose_name = 'Fabricante'
+        verbose_name_plural = 'Fabricante'
+
+    def __str__(self):
+        return self.nome
+
+    def has_permission(self, user):
+        return user.is_superuser or user.roles.contains(ADM)
+
+
+class MarcaManager(models.Manager):
+    def all(self):
+        return self.lookups(ADM)
+
+
+class Marca(models.Model):
+    nome = models.CharField('None')
+    fabricante = models.ForeignKey(Fabricante, verbose_name='Fabricante')
+
+    objects = MarcaManager()
+
+    class Meta:
+        verbose_name = 'Marca'
+        verbose_name_plural = 'Marcas'
+
+    def __str__(self):
+        return '{} ({})'.format(self.nome, self.fabricante)
+
+    def has_permission(self, user):
+        return user.is_superuser or user.roles.contains(ADM)
+
+
+class CorManager(models.Manager):
+    def all(self):
+        return self.lookups(ADM)
+
+
+class Cor(models.Model):
+    nome = models.CharField('Nome')
+
+    objects = CorManager()
+
+    class Meta:
+        verbose_name = 'Cor'
+        verbose_name_plural = 'Cor'
+
+    def __str__(self):
+        return self.nome
+
+    def has_permission(self, user):
+        return user.is_superuser or user.roles.contains(ADM)
+
+
+
 class ValidacaoManager(models.Manager):
     def all(self):
-        return self.lookups(ADM).display('placa', 'cpf_proprietario', 'nome_proprietario')
+        return self.lookups(ADM).display('placa', 'chassi', 'marca', 'cor', 'cpf_proprietario', 'nome_proprietario')
 
  
 class Validacao(models.Model):
     placa = models.BrCarPlateField('Número da Placa')
+    chassi = models.CharField('Chassi', null=True)
+    marca = models.ForeignKey(Marca, verbose_name='Marca', null=True)
+    cor = models.ForeignKey(Cor, verbose_name='Cor', null=True)
+
     dianteira = models.BooleanField('Dianteira', default=False)
     traseira = models.BooleanField('Traseira', default=False)
     segunda_traseira = models.BooleanField('Segunda Traseira', default=False)
@@ -68,7 +137,8 @@ class Validacao(models.Model):
         verbose_name = 'Validação'
         verbose_name_plural = 'Validações'
         fieldsets = {
-            'Dados da Placa': ('placa', ('dianteira', 'traseira', 'segunda_traseira')),
+            'Dados Gerais': (('placa', 'chassi'), ('marca', 'cor')),
+            'Validações': (('dianteira', 'traseira', 'segunda_traseira'),),
             'Proprietário': (('cpf_proprietario', 'nome_proprietario'), 'foto_perfil_proprietario', 'foto_documento_proprietario'),
             'Representante': (('cpf_representante', 'nome_representante'), 'foto_perfil_representante', 'foto_documento_representante', 'foto_procuracao'),
             'Fotos do Veículo': ('foto_chassi_veiculo', 'foto_dianteira_veiculo', 'foto_traseira_veiculo'),
@@ -76,8 +146,11 @@ class Validacao(models.Model):
             'Fotos do Descarte': ('foto_boletim_ocorrencia', 'foto_descarte_placa_dianteira', 'foto_descarte_placa_traseira', 'foto_descarte_segunda_placa_traseira'),
         }
 
-    def get_dados_placa(self):
-        return self.value_set('placa', ('dianteira', 'traseira', 'segunda_traseira'))
+    def get_dados_gerais(self):
+        self.value_set(('placa', 'chassi'), ('marca', 'cor'))
+
+    def get_dados_validacao(self):
+        return self.value_set(('dianteira', 'traseira', 'segunda_traseira'))
 
     def get_proprietario(self):
         return self.value_set(('cpf_proprietario', 'nome_proprietario'), 'get_foto_perfil_proprietario', 'get_foto_documento_proprietario')
@@ -155,7 +228,7 @@ class Validacao(models.Model):
         return self.foto_descarte_segunda_placa_traseira
 
     def view(self):
-        return self.value_set('get_dados_placa', 'get_proprietario', 'get_representante', 'get_fotos_veiculo', 'get_fotos_placas', 'get_fotos_descarte')
+        return self.value_set('get_dados_gerais', 'get_dados_validacao', 'get_proprietario', 'get_representante', 'get_fotos_veiculo', 'get_fotos_placas', 'get_fotos_descarte')
 
     def __str__(self):
         return '{}'.format(self.placa)
