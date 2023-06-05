@@ -147,7 +147,7 @@ class Validacao(models.Model):
         }
 
     def get_dados_gerais(self):
-        self.value_set(('placa', 'chassi'), ('marca', 'cor'))
+        return self.value_set(('placa', 'chassi'), ('marca', 'cor'))
 
     def get_dados_validacao(self):
         return self.value_set(('dianteira', 'traseira', 'segunda_traseira'))
