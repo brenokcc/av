@@ -208,5 +208,5 @@ if os.environ.get('POSTGRES_HOST'):
 
 try:
     from .local_settings import *
-except ImportError:
-    print('>> Could not import local_settings.py')
+except ImportError as e:
+    print('[WARNING] Could not import local_settings.py: {}'.format(e))
