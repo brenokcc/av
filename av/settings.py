@@ -206,5 +206,7 @@ if os.environ.get('POSTGRES_HOST'):
     DATABASES['default']['HOST'] = os.environ.get('DATABASE_HOST', 'postgres')
     DATABASES['default']['PORT'] = os.environ.get('DATABASE_PORT', '5432')
 
-
-from .local_settings import *
+try:
+    from .local_settings import *
+except ImportError:
+    print('>> Could not import local_settings.py')
