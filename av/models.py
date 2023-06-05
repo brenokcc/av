@@ -39,27 +39,27 @@ class Validacao(models.Model):
 
     cpf_proprietario = models.BrCpfField('CPF do Proprietário')
     nome_proprietario = models.CharField('Nome do Proprietário')
-    foto_perfil_proprietario = models.PhotoField('Foto de Perfil do Proprietário', null=True, blank=True, upload_to='fotos')
-    foto_documento_proprietario = models.PhotoField('Foto do Documento do Proprietário', null=True, blank=True, upload_to='fotos')
+    foto_perfil_proprietario = models.PhotoField('Foto de Perfil do Proprietário', null=True, blank=True, upload_to='fotos', max_width=500)
+    foto_documento_proprietario = models.PhotoField('Foto do Documento do Proprietário', null=True, blank=True, upload_to='fotos', max_width=800)
 
     cpf_representante = models.BrCpfField('CPF do Representante', null=True, blank=True)
     nome_representante = models.CharField('Nome do Representante', null=True, blank=True)
-    foto_perfil_representante = models.PhotoField('Foto de Perfil do Representante', null=True, blank=True, upload_to='fotos')
-    foto_documento_representante = models.PhotoField('Foto do Documento do Representante', null=True, blank=True, upload_to='fotos')
-    foto_procuracao = models.PhotoField('Foto da Procuração', null=True, blank=True, upload_to='fotos')
+    foto_perfil_representante = models.PhotoField('Foto de Perfil do Representante', null=True, blank=True, upload_to='fotos', max_width=500)
+    foto_documento_representante = models.PhotoField('Foto do Documento do Representante', null=True, blank=True, upload_to='fotos', max_width=800)
+    foto_procuracao = models.PhotoField('Foto da Procuração', null=True, blank=True, upload_to='fotos', max_width=800)
 
-    foto_chassi_veiculo = models.PhotoField('Foto do Chassi do Veículo', null=True, blank=True, upload_to='fotos')
-    foto_dianteira_veiculo = models.PhotoField('Foto Dianteira do Veículo', null=True, blank=True, upload_to='fotos')
-    foto_traseira_veiculo = models.PhotoField('Foto Traseira do Veículo', null=True, blank=True, upload_to='fotos')
+    foto_chassi_veiculo = models.PhotoField('Foto do Chassi do Veículo', null=True, blank=True, upload_to='fotos', max_width=800)
+    foto_dianteira_veiculo = models.PhotoField('Foto Dianteira do Veículo', null=True, blank=True, upload_to='fotos', max_width=500)
+    foto_traseira_veiculo = models.PhotoField('Foto Traseira do Veículo', null=True, blank=True, upload_to='fotos', max_width=500)
 
-    foto_placa_dianteira = models.PhotoField('Foto da Placa Dianteira', null=True, blank=True, upload_to='fotos')
-    foto_placa_traseira = models.PhotoField('Foto da Placa Traseira', null=True, blank=True, upload_to='fotos')
-    foto_segunda_placa_traseira = models.PhotoField('Foto da Segunda Placa Traseira', null=True, blank=True, upload_to='fotos')
+    foto_placa_dianteira = models.PhotoField('Foto da Placa Dianteira', null=True, blank=True, upload_to='fotos', max_width=500)
+    foto_placa_traseira = models.PhotoField('Foto da Placa Traseira', null=True, blank=True, upload_to='fotos', max_width=500)
+    foto_segunda_placa_traseira = models.PhotoField('Foto da Segunda Placa Traseira', null=True, blank=True, upload_to='fotos', max_width=500)
 
-    foto_boletim_ocorrencia = models.PhotoField('Foto do Boletim de Ocorrência', null=True, blank=True, upload_to='fotos')
-    foto_descarte_placa_dianteira = models.PhotoField('Foto do Descarte da Placa Dianteira', null=True, blank=True, upload_to='fotos')
-    foto_descarte_placa_traseira = models.PhotoField('Foto do Descarte da Placa Traseira', null=True, blank=True, upload_to='fotos')
-    foto_descarte_segunda_placa_traseira = models.PhotoField('Foto do Descarte da Segunda Placa Traseira', null=True, blank=True, upload_to='fotos')
+    foto_boletim_ocorrencia = models.PhotoField('Foto do Boletim de Ocorrência', null=True, blank=True, upload_to='fotos', max_width=800)
+    foto_descarte_placa_dianteira = models.PhotoField('Foto do Descarte da Placa Dianteira', null=True, blank=True, upload_to='fotos', max_width=500)
+    foto_descarte_placa_traseira = models.PhotoField('Foto do Descarte da Placa Traseira', null=True, blank=True, upload_to='fotos', max_width=500)
+    foto_descarte_segunda_placa_traseira = models.PhotoField('Foto do Descarte da Segunda Placa Traseira', null=True, blank=True, upload_to='fotos', max_width=500)
 
     objects = ValidacaoManager()
     
