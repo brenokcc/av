@@ -33,21 +33,9 @@ class Service():
     PRODUCT_SEARCH = 12
     OBJECT_LOCALIZATION = 19
 
-    VALID_CHASSI_LABELS = ['METAL', 'MOTOR VEHICLE']
-    INVALID_CHASSI_LABELS = ['RECTANGLE', 'PATTERN', 'PAPER PRODUCT', 'EYEWEAR', 'PAPER', 'MONOCHROME PHOTOGRAPHY', 'LOGO', 'EVENT', 'BRAND', 'ROOM', 'CEILING', 'WINDOW', 'GLASS', 'WINDSHIELD', 'REFLECTION', 'TRANSPARENT MATERIAL', 'AUTOMOTIVE MIRROR', 'WINDSCREEN WIPER', 'ROAD', 'STREET']
-
 
     def __init__(self):
         self.token = os.environ['GOOGLE_VISION_TOKEN']
-
-    def is_chassi(self, labels):
-        for label in labels:
-            if label.upper() in Service.INVALID_CHASSI_LABELS:
-                return label.upper()
-        for label in Service.VALID_CHASSI_LABELS:
-            if label.upper() not in Service.VALID_CHASSI_LABELS:
-                return label.upper()
-        return False
 
     def base64(self, path):
         return base64.b64encode(open(path, 'rb').read()).decode()

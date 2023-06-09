@@ -231,11 +231,11 @@ class Validacao(models.Model):
 
     @meta('Consultas')
     def get_consultas(self):
-        return self.consulta_set.display('tipo', 'data_hora', 'get_valor', 'observacao')
+        return self.consulta_set.display('tipo', 'data_hora', 'get_valor', 'valida').actions('view', 'edit')
 
     @meta('Verificações')
     def get_verificacoes(self):
-        return self.verificacao_set.display('descricao', 'satisfeita')
+        return self.verificacao_set.display('descricao', 'satisfeita', 'observacao')
 
     def view(self):
         # self.consultar()
@@ -311,6 +311,7 @@ class Validacao(models.Model):
         for tipo in tipos:
             Verificacao.objects.get_or_create(validacao=self, descricao=tipo, defaults=dict(satisfeita=None))
 
+
 class ConsultaManager(models.Manager):
     def all(self):
         return self
@@ -331,12 +332,13 @@ class Consulta(models.Model):
     FOTO_SEGUNDA_PLACA_TRASEIRA = 'Foto da Segunda Placa Traseira'
     NUMERO_CHASSI = 'Número do Chassi'
     CARACTERISTICAS_CHASSI = 'Características do Chassi'
+    COR_VEICULO = 'Cor do Veículo'
 
     validacao = models.ForeignKey(Validacao, verbose_name='Validação')
     tipo = models.CharField('Tipo')
     data_hora = models.DateTimeField('Data/Hora')
     valor = models.CharField('Valor')
-    observacao = models.CharField('Observação', null=True)
+    valida = models.BooleanField('Válida', default=True)
     
     objects = ConsultaManager()
     
@@ -344,7 +346,7 @@ class Consulta(models.Model):
         verbose_name = 'Consulta'
         verbose_name_plural = 'Consultas'
         fieldsets = {
-            'Dados Gerais': ('validacao', 'valor', 'observacao'),
+            'Dados Gerais': ('validacao', 'valor', 'valida'),
         }
         
     def __str__(self):
@@ -415,6 +417,7 @@ class Verificacao(models.Model):
     validacao = models.ForeignKey(Validacao, verbose_name='Validação')
     descricao = models.CharField('Descrição')
     satisfeita = models.BooleanField('Satisfeita', null=True)
+    observacao = models.CharField('Observação', null=True)
 
     objects = VerificacaoManager()
     

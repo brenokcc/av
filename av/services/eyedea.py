@@ -15,8 +15,6 @@ NET_ADDRESS = "https://cloud.eyedea.cz/"
 EMAIL = "brenokcc@yahoo.com.br"
 PASSWORD = os.environ['EYEDEA_PASSWORD']
 
-COLORS = {'WHITE': 'BRANCA', 'BLACK': 'PRETA', 'SILVER': 'PRATA', 'RED': 'VERMELHA', 'GRAY': 'CINZA', 'GREY': 'CINZA', 'YELLOW': 'AMARELA', 'BLUE': 'AZUL', 'GREEN': 'VERDE', 'BROWN': 'MARROM', 'ORANGE': 'LARANJA', 'BEIGE': 'BEGE', 'GOLDEN': 'DOURADA', 'FANTASY': 'FANTASIA', 'PURPLE': 'ROXA', 'PINK': 'ROSA'}
-
 
 class Service:
 
