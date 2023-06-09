@@ -46,4 +46,4 @@ class Validar(actions.Action):
         super().submit()
 
     def has_permission(self, user):
-        return user.roles.contains(ADM) or user.is_superuser
+        return user.is_superuser # or user.roles.contains(ADM)
