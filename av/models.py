@@ -264,7 +264,7 @@ class Validacao(models.Model):
         verbose_name_plural = 'Validações'
         fieldsets = {
             'Dados Gerais': ('estampador', ('placa', 'chassi'), ('marca', 'cor')),
-            'Operador': (('operador', 'foto_perfil_operador'),),
+            'Operador': ('operador', 'foto_perfil_operador'),
             'Localização': (('latitude', 'longitude'),),
             'Proprietário': (('cpf_proprietario', 'nome_proprietario'), 'foto_perfil_proprietario', 'foto_documento_proprietario'),
             'Representante': (('cpf_representante', 'nome_representante'), 'foto_perfil_representante', 'foto_documento_representante', 'foto_procuracao'),
