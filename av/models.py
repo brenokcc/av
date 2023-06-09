@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sloth.db import models, role, meta
 from .roles import ADM
 
@@ -227,8 +229,17 @@ class Validacao(models.Model):
     def get_foto_descarte_segunda_placa_traseira(self):
         return self.foto_descarte_segunda_placa_traseira
 
+    @meta('Consultas')
+    def get_consultas(self):
+        return self.consulta_set.display('tipo', 'data_hora', 'get_valor', 'observacao')
+
+    @meta('Verificações')
+    def get_verificacoes(self):
+        return self.verificacao_set.display('descricao', 'satisfeita')
+
     def view(self):
-        return self.value_set('get_dados_gerais', 'get_dados_validacao', 'get_proprietario', 'get_representante', 'get_fotos_veiculo', 'get_fotos_placas', 'get_fotos_descarte')
+        # self.consultar()
+        return self.value_set('get_dados_gerais', 'get_dados_validacao', 'get_proprietario', 'get_representante', 'get_fotos_veiculo', 'get_fotos_placas', 'get_fotos_descarte', 'get_consultas', 'get_verificacoes')
 
     def __str__(self):
         return '{}'.format(self.placa)
@@ -236,3 +247,183 @@ class Validacao(models.Model):
     def has_permission(self, user):
         return user.is_superuser or user.roles.contains(ADM)
 
+    def get_url(self, attr_name):
+        foto = getattr(self, attr_name)
+        url = 'https://av.cloud.aplicativo.click'
+        return '{}/media/{}'.format(url, foto.name) if foto else None
+
+    def gerar_verificacoes(self):
+        tipos = [
+            Verificacao.GEOLOCALIZACAO,
+            Verificacao.RECONHECIMENTO_OPERADOR,
+            Verificacao.PRESENCA_OPERADOR,
+            Verificacao.NOME_PROPRIETARIO,
+            Verificacao.CPF_PROPRIETARIO,
+            Verificacao.RECONHECIMENTO_PROPRIETARIO,
+            Verificacao.PRESENCA_PROPRIETARIO,
+            Verificacao.NUMERO_CHASSI,
+            Verificacao.CARACTERISTICA_CHASSI,
+            Verificacao.MARCA_VEICULO,
+            Verificacao.COR_VEICULO
+        ]
+        if self.nome_representante:
+            tipos.extend([
+                Verificacao.NOME_REPRESENTANTE,
+                Verificacao.CPF_REPRESENTANTE,
+                Verificacao.RECONHECIMENTO_REPRESENTANTE,
+                Verificacao.PRESENCA_REPRESENTANTE,
+                Verificacao.TITULO_PROCURACAO,
+                Verificacao.DADOS_PROPRIETARIO_PROCURACAO,
+                Verificacao.DADOS_REPRESENTANTE_PROCURACAO,
+                Verificacao.PLACA_PROCURACAO,
+                Verificacao.ASSINATURA_PROCURACAO
+            ])
+        if self.foto_placa_dianteira:
+            tipos.extend([
+                Verificacao.NUMERO_PLACA_DIANTEIRA,
+                Verificacao.ITENS_SEGURANCA_PLACA_DIANTEIRA,
+                Verificacao.QRCODE_PLACA_DIANTEIRA
+            ])
+        if self.foto_placa_traseira:
+            tipos.extend([
+                Verificacao.NUMERO_PLACA_TRASEIRA,
+                Verificacao.ITENS_SEGURANCA_PLACA_TRASEIRA,
+                Verificacao.QRCODE_PLACA_TRASEIRA
+            ])
+        if self.foto_segunda_placa_traseira:
+            tipos.extend([
+                Verificacao.NUMERO_SEGUNDA_PLACA_TRASEIRA,
+                Verificacao.ITENS_SEGUNDA_SEGURANCA_PLACA_TRASEIRA,
+                Verificacao.QRCODE_SEGUNDA_PLACA_TRASEIRA
+            ])
+        if self.foto_boletim_ocorrencia:
+            tipos.extend([
+                Verificacao.TITULO_BOLETIM_OCORRENCIA,
+                Verificacao.DADOS_PROPRIETARIO_BOLETIM_OCORRENCIA,
+                Verificacao.PLACA_BOLETIM_OCORRENCIA
+            ])
+        if self.foto_descarte_placa_dianteira:
+            tipos.append(Verificacao.DESCARTE_PLACA_DIANTEIRA)
+        if self.foto_descarte_placa_traseira:
+            tipos.append(Verificacao.DESCARTE_PLACA_TRASEIRA)
+        if self.get_foto_descarte_segunda_placa_traseira:
+            tipos.append(Verificacao.DESCARTE_SEGUNDA_PLACA_TRASEIRA)
+        for tipo in tipos:
+            Verificacao.objects.get_or_create(validacao=self, descricao=tipo, defaults=dict(satisfeita=None))
+
+class ConsultaManager(models.Manager):
+    def all(self):
+        return self
+
+ 
+class Consulta(models.Model):
+
+    DOCUMENTO_PROPRIETARIO = 'Documento do Proprietário'
+    DOCUMENTO_REPRESENTANTE = 'Documento do Representante'
+    MARCA_FOTO_DIANTEIRA = 'Marca da Foto Dianteira'
+    MARCA_FOTO_TRASEIRA = 'Marca da Foto Traseira'
+    FOTO_PROPRIETARIO = 'Foto do Proprietário'
+    PRESENCA_PROPRIETARIO = 'Presença do Proprietário'
+    FOTO_REPRESENTANTE = 'Foto do Representante'
+    PRESENCA_REPRESENTANTE = 'Presença do Representante'
+    FOTO_PLACA_DIANTEIRA = 'Foto da Placa Dianteira'
+    FOTO_PLACA_TRASEIRA = 'Foto da Placa Traseira'
+    FOTO_SEGUNDA_PLACA_TRASEIRA = 'Foto da Segunda Placa Traseira'
+    NUMERO_CHASSI = 'Número do Chassi'
+    CARACTERISTICAS_CHASSI = 'Características do Chassi'
+
+    validacao = models.ForeignKey(Validacao, verbose_name='Validação')
+    tipo = models.CharField('Tipo')
+    data_hora = models.DateTimeField('Data/Hora')
+    valor = models.CharField('Valor')
+    observacao = models.CharField('Observação', null=True)
+    
+    objects = ConsultaManager()
+    
+    class Meta:
+        verbose_name = 'Consulta'
+        verbose_name_plural = 'Consultas'
+        fieldsets = {
+            'Dados Gerais': ('validacao', 'valor', 'observacao'),
+        }
+        
+    def __str__(self):
+        return '{}'.format(self.pk)
+
+    def get_valor(self):
+        valor = self.valor
+        if valor and len(valor) > 100:
+            valor = '{}...'.format(valor[0:100])
+        return valor
+        
+    def has_permission(self, user):
+        return user.is_superuser
+
+
+class VerificacaoManager(models.Manager):
+    def all(self):
+        return self
+
+ 
+class Verificacao(models.Model):
+    GEOLOCALIZACAO = 'Geolocalização de instalação previamente cadastrada'
+    RECONHECIMENTO_OPERADOR = 'Compatibilidade entre a foto de perfil do operador com a foto previamente cadastrada'
+    PRESENCA_OPERADOR = 'Foto do operador retirada no momento do emplacamento'
+
+    NOME_PROPRIETARIO = 'Nome do proprietário presente no documento de identificação'
+    CPF_PROPRIETARIO = 'CPF do proprietário presente no documento de identificação'
+    RECONHECIMENTO_PROPRIETARIO = 'Compatibilidade entre a foto de perfil e a do documento do proprietário'
+    PRESENCA_PROPRIETARIO = 'Foto do proprietário retirada no momento do emplacamento'
+
+    NOME_REPRESENTANTE = 'Nome do representante presente no documento de identificação'
+    CPF_REPRESENTANTE = 'CPF do representante presente no documento de identificação'
+    RECONHECIMENTO_REPRESENTANTE = 'Compatibilidade entre a foto de perfil e a do documento do representante'
+    PRESENCA_REPRESENTANTE = 'Foto do representante retirada no momento do emplacamento'
+
+    TITULO_PROCURACAO = 'Palavra "procuração" presente no documento da procuração'
+    DADOS_PROPRIETARIO_PROCURACAO = 'Nome e CPF do proprietário presente no documento da procuração'
+    DADOS_REPRESENTANTE_PROCURACAO = 'Nome e CPF do representante presente no documento da procuração'
+    PLACA_PROCURACAO = 'Número da placa presente no documento da procuração'
+    ASSINATURA_PROCURACAO = 'Assinatura presente no documento da procuração'
+
+    NUMERO_CHASSI = 'Número do chassi do veículo'
+    CARACTERISTICA_CHASSI = 'Característica do chassi do veículo'
+
+    MARCA_VEICULO = 'Marca do veículo'
+    COR_VEICULO = 'Cor do veículo'
+
+    NUMERO_PLACA_DIANTEIRA = 'Número da placa dianteira'
+    ITENS_SEGURANCA_PLACA_DIANTEIRA = 'Itens de segurança da placa dianteira'
+    QRCODE_PLACA_DIANTEIRA = 'QrCode da placa dianteira'
+
+    NUMERO_PLACA_TRASEIRA = 'Número da placa traseira'
+    ITENS_SEGURANCA_PLACA_TRASEIRA = 'Itens de segurança da placa traseira'
+    QRCODE_PLACA_TRASEIRA = 'QrCode da placa traseira'
+
+    NUMERO_SEGUNDA_PLACA_TRASEIRA = 'Número da segunda placa traseira'
+    ITENS_SEGUNDA_SEGURANCA_PLACA_TRASEIRA = 'Itens de segurança segunda da placa traseira'
+    QRCODE_SEGUNDA_PLACA_TRASEIRA = 'QrCode da segunda placa traseira'
+
+    TITULO_BOLETIM_OCORRENCIA = 'Palavra "BOLETIM DE OCORRÊNCIA" presente no documento do boletim de ocorrência'
+    DADOS_PROPRIETARIO_BOLETIM_OCORRENCIA = 'Nome e CPF do representante presente no documento do boletim de ocorrência'
+    PLACA_BOLETIM_OCORRENCIA = 'Número da placa presente no documento do boletim de ocorrência'
+
+    DESCARTE_PLACA_DIANTEIRA = 'Corte na placa dianteira descartada'
+    DESCARTE_PLACA_TRASEIRA = 'Corte na placa traseira descartada'
+    DESCARTE_SEGUNDA_PLACA_TRASEIRA = 'Corte na segunda placa traseira descartada'
+
+    validacao = models.ForeignKey(Validacao, verbose_name='Validação')
+    descricao = models.CharField('Descrição')
+    satisfeita = models.BooleanField('Satisfeita', null=True)
+
+    objects = VerificacaoManager()
+    
+    class Meta:
+        verbose_name = 'Verificação'
+        verbose_name_plural = 'Verificações'
+        
+    def __str__(self):
+        return '{}'.format(self.pk)
+        
+    def has_permission(self, user):
+        return user.is_superuser
