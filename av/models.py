@@ -66,7 +66,7 @@ class Estampador(models.Model):
 
 class OperadorManager(models.Manager):
     def all(self):
-        return self
+        return self.lookups(ADM)
 
 
 class Operador(models.Model):
