@@ -31,7 +31,7 @@ class Administrador(models.Model):
 
 class EstampadorManager(models.Manager):
     def all(self):
-        return self
+        return self.lookups(ADM)
 
  
 class Estampador(models.Model):
