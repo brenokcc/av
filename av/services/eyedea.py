@@ -32,7 +32,7 @@ class Service:
         return info_result
 
     def detect_color(self, uri):
-        color = None
+        color = ''
         payload = {"email": self.email, "password": self.password}
         if uri.startswith('http'):
             file = requests.get(uri).content
@@ -47,5 +47,5 @@ class Service:
         classification = json.loads(r.content.decode("utf-8"))
         if 'tags' in classification and classification['tags']:
             result = classification['tags'][0].get('mmrResult')
-            color = result.get('color')
+            color = result.get('color', '')
         return color

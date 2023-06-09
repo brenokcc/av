@@ -1,7 +1,8 @@
 from datetime import datetime
-
+import geopy.distance
 from sloth.db import models, role, meta
 from .roles import ADM
+from django.conf import settings
 
 
 class AdministradorManager(models.Manager):
@@ -26,6 +27,105 @@ class Administrador(models.Model):
 
     def has_permission(self, user):
         return user.is_superuser
+
+
+class EstampadorManager(models.Manager):
+    def all(self):
+        return self
+
+ 
+class Estampador(models.Model):
+    cnpj = models.BrCnpjField('CNPJ')
+    
+    objects = EstampadorManager()
+    
+    class Meta:
+        verbose_name = 'Estampador'
+        verbose_name_plural = 'Estampadores'
+
+    def get_dados_gerais(self):
+        return self.value_set('cnpj')
+
+    def get_operadores(self):
+        return self.operador_set.related_field('estampador').display('get_foto', 'cpf')
+
+    @meta('Locais de Instalação')
+    def get_locais_instalacao(self):
+        return self.localinstalacao_set.related_field('estampador').display('latitude', 'longitude', 'get_geolocalizacao').rows()
+
+    def view(self):
+        return self.value_set('get_dados_gerais', 'get_operadores', 'get_locais_instalacao')
+        
+    def __str__(self):
+        return self.cnpj
+        
+    def has_permission(self, user):
+        return user.is_superuser or user.roles.contains(ADM)
+
+
+
+class OperadorManager(models.Manager):
+    def all(self):
+        return self
+
+
+class Operador(models.Model):
+    estampador = models.ForeignKey(Estampador, verbose_name='Estampador')
+    cpf = models.BrCpfField('CPF')
+    foto = models.PhotoField('Foto', upload_to='fotos')
+
+    objects = OperadorManager()
+
+    class Meta:
+        verbose_name = 'Operador'
+        verbose_name_plural = 'Operadores'
+
+    def __str__(self):
+        return self.cpf
+
+    @meta('Foto', renderer='images/image')
+    def get_foto(self):
+        return self.foto
+
+    def get_url_foto(self):
+        return '{}/media/{}'.format(settings.SITE_URL, self.foto.name) if self.foto else None
+
+    def has_permission(self, user):
+        return user.is_superuser or user.roles.contains(ADM)
+
+
+class LocalInstalacaoManager(models.Manager):
+    def all(self):
+        return self
+
+ 
+class LocalInstalacao(models.Model):
+    estampador = models.ForeignKey(Estampador, verbose_name='Estampador')
+    nome = models.CharField('Nome')
+    latitude = models.CharField('Latitude')
+    longitude = models.CharField('Longitude')
+    
+    objects = LocalInstalacaoManager()
+    
+    class Meta:
+        verbose_name = 'Local de Instalação'
+        verbose_name_plural = 'Locais de Instalação'
+        
+    def __str__(self):
+        return self.nome
+        
+    def has_permission(self, user):
+        return user.is_superuser or user.roles.contains(ADM)
+
+    @meta('Geolocalização', renderer='maps/geolocation')
+    def get_geolocalizacao(self):
+        return self.latitude, self.longitude
+
+    def calcular_distancia(self, latitude, longitude):
+        coords_1 = (self.latitude, self.longitude)
+        coords_2 = (latitude, longitude)
+        distancia = geopy.distance.geodesic(coords_1, coords_2)
+        return int(distancia.m)
 
 
 class FabricanteManager(models.Manager):
@@ -83,7 +183,7 @@ class Cor(models.Model):
 
     class Meta:
         verbose_name = 'Cor'
-        verbose_name_plural = 'Cor'
+        verbose_name_plural = 'Cores'
 
     def __str__(self):
         return self.nome
@@ -92,10 +192,32 @@ class Cor(models.Model):
         return user.is_superuser or user.roles.contains(ADM)
 
 
+class CodigoCorManager(models.Manager):
+    def all(self):
+        return self.display('nome', 'cores')
+
+
+class CodigoCor(models.Model):
+    nome = models.CharField('Nome')
+    cores = models.ManyToManyField('av.Cor', verbose_name='Cores', blank=True)
+
+    objects = CodigoCorManager()
+
+    class Meta:
+        verbose_name = 'Código de Cor'
+        verbose_name_plural = 'Códigos de Cores'
+
+    def __str__(self):
+        return '{}'.format(self.pk)
+
+    def has_permission(self, user):
+        return user.is_superuser
+
+
 
 class ValidacaoManager(models.Manager):
     def all(self):
-        return self.lookups(ADM).display('placa', 'chassi', 'marca', 'cor', 'cpf_proprietario', 'nome_proprietario')
+        return self.lookups(ADM).display('placa', 'chassi', 'marca', 'cor', 'estampador', 'operador', 'cpf_proprietario', 'nome_proprietario')
 
  
 class Validacao(models.Model):
@@ -104,9 +226,11 @@ class Validacao(models.Model):
     marca = models.ForeignKey(Marca, verbose_name='Marca', null=True)
     cor = models.ForeignKey(Cor, verbose_name='Cor', null=True)
 
-    dianteira = models.BooleanField('Dianteira', default=False)
-    traseira = models.BooleanField('Traseira', default=False)
-    segunda_traseira = models.BooleanField('Segunda Traseira', default=False)
+    estampador = models.ForeignKey(Estampador, verbose_name='Estampador', null=True)
+    operador = models.ForeignKey(Operador, verbose_name='Operador', null=True)
+    foto_perfil_operador = models.PhotoField(verbose_name='Foto de Perfil do Operador', null=True)
+    latitude = models.CharField('Latitude', null=True)
+    longitude = models.CharField('Longitude', null=True)
 
     cpf_proprietario = models.BrCpfField('CPF do Proprietário')
     nome_proprietario = models.CharField('Nome do Proprietário')
@@ -139,8 +263,9 @@ class Validacao(models.Model):
         verbose_name = 'Validação'
         verbose_name_plural = 'Validações'
         fieldsets = {
-            'Dados Gerais': (('placa', 'chassi'), ('marca', 'cor')),
-            'Validações': (('dianteira', 'traseira', 'segunda_traseira'),),
+            'Dados Gerais': ('estampador', ('placa', 'chassi'), ('marca', 'cor')),
+            'Operador': (('operador', 'foto_perfil_operador'),),
+            'Localização': (('latitude', 'longitude'),),
             'Proprietário': (('cpf_proprietario', 'nome_proprietario'), 'foto_perfil_proprietario', 'foto_documento_proprietario'),
             'Representante': (('cpf_representante', 'nome_representante'), 'foto_perfil_representante', 'foto_documento_representante', 'foto_procuracao'),
             'Fotos do Veículo': ('foto_chassi_veiculo', 'foto_dianteira_veiculo', 'foto_traseira_veiculo'),
@@ -149,14 +274,26 @@ class Validacao(models.Model):
         }
 
     def get_dados_gerais(self):
-        return self.value_set(('placa', 'chassi'), ('marca', 'cor'))
+        return self.value_set('estampador', ('placa', 'chassi'), ('marca', 'cor'))
 
-    def get_dados_validacao(self):
-        return self.value_set(('dianteira', 'traseira', 'segunda_traseira'))
+    @meta('Dados do Operador')
+    def get_operador(self):
+        return self.value_set('operador', 'get_foto_perfil_operador')
 
+    @meta('Foto do Operador', renderer='images/image')
+    def get_foto_perfil_operador(self):
+        return self.foto_perfil_operador
+
+    @meta('Localização')
+    def get_localizacao(self):
+        return self.value_set(('latitude', 'longitude'))
+
+
+    @meta('Dados do Proprietário')
     def get_proprietario(self):
         return self.value_set(('cpf_proprietario', 'nome_proprietario'), 'get_foto_perfil_proprietario', 'get_foto_documento_proprietario')
 
+    @meta('Dados do Representante')
     def get_representante(self):
         return self.value_set(('cpf_representante', 'nome_representante'), 'get_foto_perfil_representante', 'get_foto_documento_representante', 'get_foto_procuracao')
 
@@ -231,15 +368,15 @@ class Validacao(models.Model):
 
     @meta('Consultas')
     def get_consultas(self):
-        return self.consulta_set.display('tipo', 'data_hora', 'get_valor', 'valida').actions('view', 'edit')
+        return self.consulta_set.display('tipo', 'data_hora', 'get_valor', 'get_valida').actions('view')
 
     @meta('Verificações')
     def get_verificacoes(self):
-        return self.verificacao_set.display('descricao', 'satisfeita', 'observacao')
+        return self.verificacao_set.display('descricao', 'get_satisfeita', 'observacao')
 
     def view(self):
         # self.consultar()
-        return self.value_set('get_dados_gerais', 'get_dados_validacao', 'get_proprietario', 'get_representante', 'get_fotos_veiculo', 'get_fotos_placas', 'get_fotos_descarte', 'get_consultas', 'get_verificacoes')
+        return self.value_set('get_dados_gerais', 'get_localizacao', 'get_operador', 'get_proprietario', 'get_representante', 'get_fotos_veiculo', 'get_fotos_placas', 'get_fotos_descarte', 'get_consultas', 'get_verificacoes').actions('validar', 'alterar_validacao')
 
     def __str__(self):
         return '{}'.format(self.placa)
@@ -249,8 +386,7 @@ class Validacao(models.Model):
 
     def get_url(self, attr_name):
         foto = getattr(self, attr_name)
-        url = 'https://av.cloud.aplicativo.click'
-        return '{}/media/{}'.format(url, foto.name) if foto else None
+        return '{}/media/{}'.format(settings.SITE_URL, foto.name) if foto else None
 
     def gerar_verificacoes(self):
         tipos = [
@@ -311,6 +447,13 @@ class Validacao(models.Model):
         for tipo in tipos:
             Verificacao.objects.get_or_create(validacao=self, descricao=tipo, defaults=dict(satisfeita=None))
 
+    def validar(self):
+        from . import consultor
+        from . import verificador
+        consultor.consultar_servicos(self)
+        for verificacao in self.verificacao_set.all():
+            verificador.realizar_verificacoes(verificacao)
+
 
 class ConsultaManager(models.Manager):
     def all(self):
@@ -318,7 +461,8 @@ class ConsultaManager(models.Manager):
 
  
 class Consulta(models.Model):
-
+    FOTO_OPERADOR = 'Foto do Operador'
+    PRESENCA_OPERADOR = 'Presença do Operador'
     DOCUMENTO_PROPRIETARIO = 'Documento do Proprietário'
     DOCUMENTO_REPRESENTANTE = 'Documento do Representante'
     MARCA_FOTO_DIANTEIRA = 'Marca da Foto Dianteira'
@@ -330,6 +474,9 @@ class Consulta(models.Model):
     FOTO_PLACA_DIANTEIRA = 'Foto da Placa Dianteira'
     FOTO_PLACA_TRASEIRA = 'Foto da Placa Traseira'
     FOTO_SEGUNDA_PLACA_TRASEIRA = 'Foto da Segunda Placa Traseira'
+    OCR_PLACA_DIANTEIRA = 'OCR da Placa Dianteira'
+    OCR_PLACA_TRASEIRA = 'OCR da Placa Traseira'
+    OCR_SEGUNDA_PLACA_TRASEIRA = 'OCR da Segunda Placa Traseira'
     NUMERO_CHASSI = 'Número do Chassi'
     CARACTERISTICAS_CHASSI = 'Características do Chassi'
     COR_VEICULO = 'Cor do Veículo'
@@ -337,7 +484,8 @@ class Consulta(models.Model):
     validacao = models.ForeignKey(Validacao, verbose_name='Validação')
     tipo = models.CharField('Tipo')
     data_hora = models.DateTimeField('Data/Hora')
-    valor = models.CharField('Valor')
+    url = models.CharField('URL', null=True, blank=True)
+    valor = models.TextField('Valor')
     valida = models.BooleanField('Válida', default=True)
     
     objects = ConsultaManager()
@@ -357,6 +505,10 @@ class Consulta(models.Model):
         if valor and len(valor) > 100:
             valor = '{}...'.format(valor[0:100])
         return valor
+
+    @meta('Válida', renderer='badges/boolean')
+    def get_valida(self):
+        return self.valida
         
     def has_permission(self, user):
         return user.is_superuser
@@ -430,3 +582,7 @@ class Verificacao(models.Model):
         
     def has_permission(self, user):
         return user.is_superuser
+
+    @meta('Satisfeita', renderer='badges/boolean')
+    def get_satisfeita(self):
+        return self.satisfeita

@@ -3,6 +3,7 @@ from .models import Validacao
 from .roles import ADM
 
 
+
 class CadastrarValidacao(actions.Action):
     class Meta:
         model = Validacao
@@ -27,6 +28,21 @@ class AlterarValidacao(actions.Action):
         fieldsets = Validacao.metaclass().fieldsets
 
     def submit(self):
+        super().submit()
+
+    def has_permission(self, user):
+        return user.roles.contains(ADM) or user.is_superuser
+
+
+class Validar(actions.Action):
+    class Meta:
+        icon = 'check2-all'
+        verbose_name = 'Validar'
+        modal = True
+        style = 'success'
+
+    def submit(self):
+        self.instance.validar()
         super().submit()
 
     def has_permission(self, user):
