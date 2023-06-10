@@ -4,6 +4,7 @@ import geopy.distance
 from sloth.db import models, role, meta
 from .roles import ADM
 from django.conf import settings
+from uuid import uuid1
 
 
 class AdministradorManager(models.Manager):
@@ -481,9 +482,10 @@ class Validacao(models.Model):
         for name in ['placa_dianteira', 'placa_traseira', 'segunda_placa_traseira']:
             valor = getattr(self, f'qrcode_{name}')
             if valor and '|' in valor:
+                file_name = '{}.png'.format(uuid1().hex)
                 update[f'qrcode_{name}'], img64 = valor.split('|')
-                open(f'media/fotos/{name}{self.pk}.png', 'wb').write(base64.b64decode(img64))
-                update[f'foto_{name}'] = f'fotos/{name}{self.pk}.png'
+                open(f'media/fotos/{file_name}', 'wb').write(base64.b64decode(img64))
+                update[f'foto_{name}'] = f'fotos/{file_name}'
         super().save(*args, **kwargs)
         if update:
             Validacao.objects.filter(pk=self.pk).update(**update)
