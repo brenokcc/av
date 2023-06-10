@@ -1,3 +1,4 @@
+import base64
 from datetime import datetime
 import geopy.distance
 from sloth.db import models, role, meta
@@ -247,6 +248,10 @@ class Validacao(models.Model):
     foto_dianteira_veiculo = models.PhotoField('Foto Dianteira do Veículo', null=True, blank=True, upload_to='fotos', max_width=500)
     foto_traseira_veiculo = models.PhotoField('Foto Traseira do Veículo', null=True, blank=True, upload_to='fotos', max_width=500)
 
+    qrcode_placa_dianteira = models.TextField('Foto da Placa Dianteira', null=True, blank=True)
+    qrcode_placa_traseira = models.TextField('Foto da Placa Traseira', null=True, blank=True)
+    qrcode_segunda_placa_traseira = models.TextField('Foto da Segunda Placa Traseira', null=True, blank=True)
+
     foto_placa_dianteira = models.PhotoField('Foto da Placa Dianteira', null=True, blank=True, upload_to='fotos', max_width=500)
     foto_placa_traseira = models.PhotoField('Foto da Placa Traseira', null=True, blank=True, upload_to='fotos', max_width=500)
     foto_segunda_placa_traseira = models.PhotoField('Foto da Segunda Placa Traseira', null=True, blank=True, upload_to='fotos', max_width=500)
@@ -269,7 +274,7 @@ class Validacao(models.Model):
             'Proprietário': (('cpf_proprietario', 'nome_proprietario'), 'foto_perfil_proprietario', 'foto_documento_proprietario'),
             'Representante': (('cpf_representante', 'nome_representante'), 'foto_perfil_representante', 'foto_documento_representante', 'foto_procuracao'),
             'Fotos do Veículo': ('foto_chassi_veiculo', 'foto_dianteira_veiculo', 'foto_traseira_veiculo'),
-            'Fotos das Placas': ('foto_placa_dianteira', 'foto_placa_traseira', 'foto_segunda_placa_traseira'),
+            'Fotos das Placas': ('qrcode_placa_dianteira', 'qrcode_placa_traseira', 'qrcode_segunda_placa_traseira'),
             'Fotos do Descarte': ('foto_boletim_ocorrencia', 'foto_descarte_placa_dianteira', 'foto_descarte_placa_traseira', 'foto_descarte_segunda_placa_traseira'),
         }
 
@@ -300,9 +305,15 @@ class Validacao(models.Model):
     def get_fotos_veiculo(self):
         return self.value_set('get_foto_chassi_veiculo', 'get_foto_dianteira_veiculo', 'get_foto_traseira_veiculo')
 
+    @meta('QrCode das Placas')
+    def get_qrcode_placas(self):
+        return self.value_set('qrcode_placa_dianteira', 'qrcode_placa_traseira', 'qrcode_segunda_placa_traseira')
+
+    @meta('Foto das Placas')
     def get_fotos_placas(self):
         return self.value_set('get_foto_placa_dianteira', 'get_foto_placa_traseira', 'get_foto_segunda_placa_traseira')
 
+    @meta('Fotos do Descarte')
     def get_fotos_descarte(self):
         return self.value_set('get_foto_boletim_ocorrencia', 'get_foto_descarte_placa_dianteira', 'get_foto_descarte_placa_traseira', 'get_foto_descarte_segunda_placa_traseira')
 
@@ -376,7 +387,7 @@ class Validacao(models.Model):
 
     def view(self):
         # self.consultar()
-        return self.value_set('get_dados_gerais', 'get_localizacao', 'get_operador', 'get_proprietario', 'get_representante', 'get_fotos_veiculo', 'get_fotos_placas', 'get_fotos_descarte', 'get_consultas', 'get_verificacoes').actions('validar', 'alterar_validacao')
+        return self.value_set('get_dados_gerais', 'get_localizacao', 'get_operador', 'get_proprietario', 'get_representante', 'get_fotos_veiculo', 'get_qrcode_placas', 'get_fotos_placas', 'get_fotos_descarte', 'get_consultas', 'get_verificacoes').actions('validar', 'alterar_validacao')
 
     def __str__(self):
         return '{}'.format(self.placa)
@@ -453,6 +464,19 @@ class Validacao(models.Model):
         consultor.consultar_servicos(self)
         for verificacao in self.verificacao_set.all():
             verificador.realizar_verificacoes(verificacao)
+
+    def save(self, *args, **kwargs):
+        update = {}
+        for name in ['placa_dianteira', 'placa_traseira', 'segunda_placa_traseira']:
+            valor = getattr(self, f'qrcode_{name}')
+            if valor and '|' in valor:
+                update[f'qrcode_{name}'], img64 = valor.split('|')
+                open(f'media/fotos/{name}{self.pk}.png', 'wb').write(base64.b64decode(img64))
+                update[f'foto_{name}'] = f'fotos/{name}{self.pk}.png'
+        super().save(*args, **kwargs)
+        if update:
+            Validacao.objects.filter(pk=self.pk).update(**update)
+
 
 
 class ConsultaManager(models.Manager):

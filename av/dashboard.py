@@ -7,7 +7,7 @@ class AppDashboard(Dashboard):
     def __init__(self, request):
         super().__init__(request)
         self.styles('/static/css/sloth.css')
-        self.scripts('/static/js/sloth.js')
+        self.scripts('/static/js/sloth.js', '/static/js/html5-qrcode.js')
         self.libraries(fontawesome=False, materialicons=False)
         self.web_push_notification(False)
         self.login(logo='/static/images/placa.png', title=None, mask=None, two_factor=False, actions=[])
