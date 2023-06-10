@@ -1,10 +1,17 @@
-<div id="reader{{ name }}" width="600px"></div>
-<button type="button" onclick="scan{{ name }}()" style="font-size:150%">Scan QrCode</button>
+<div id="container{{ name }}" style="position:fixed;top:0">
+<div id="reader{{ name }}"></div>
+</div>
+<div>
+    <button type="button" onclick="scan{{ name }}()" style="font-size:150%">Scan QrCode</button>
+</div>
 <div align="center">
     <div id="result{{name}}" style="max-width:100%;margin:30px;overflow-wrap:anywhere"></div>
     <img id="qrcode{{name}}" style="display:none"></img>
     <img id="qrimage{{name}}" style="display:none"></img>
 </div>
+<style>
+
+</style>
 {{ widget }}
 <script>
     var qrtimeout = null;
@@ -16,6 +23,7 @@
 			window.qrcode{{name}}.src = document.getElementById('qr-canvas').toDataURL("image/png");
             window.qrcode{{name}}.width=document.getElementById('qr-canvas').width;
             window.qrcode{{name}}.height=document.getElementById('qr-canvas').height;
+
 			setTimeout(function(){
                 // window.qrcode{{name}}.style.display = 'block';
                 var video = document.getElementsByTagName('video')[0];
@@ -46,6 +54,9 @@
 		document.getElementById('result{{name}}').innerHTML = ''
 		window.qrcode{{name}}.style.display = 'none';
 		window.qrimage{{name}}.style.display = 'none';
+		var width = Math.min(window.innerWidth, window.innerHeight);
+		window.container{{name}}.style.width = width;
+		window.container{{name}}.style.left = Math.max((window.innerWidth-width)/2, 0);
 		html5QrCode{{ name }}.start({ facingMode: "environment" }, { fps: 1, qrbox: { width: 150, height: 150 } }, onScanSuccess{{ name }});
 		qrtimeout = setTimeout(function(){
 			html5QrCode{{ name }}.stop();

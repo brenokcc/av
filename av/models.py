@@ -293,7 +293,6 @@ class Validacao(models.Model):
     def get_localizacao(self):
         return self.value_set(('latitude', 'longitude'))
 
-
     @meta('Dados do Proprietário')
     def get_proprietario(self):
         return self.value_set(('cpf_proprietario', 'nome_proprietario'), 'get_foto_perfil_proprietario', 'get_foto_documento_proprietario')
@@ -307,7 +306,7 @@ class Validacao(models.Model):
 
     @meta('QrCode das Placas')
     def get_qrcode_placas(self):
-        return self.value_set('qrcode_placa_dianteira', 'qrcode_placa_traseira', 'qrcode_segunda_placa_traseira')
+        return self.value_set('get_qrcode_placa_dianteira', 'get_qrcode_placa_traseira', 'get_qrcode_segunda_placa_traseira')
 
     @meta('Foto das Placas')
     def get_fotos_placas(self):
@@ -360,6 +359,18 @@ class Validacao(models.Model):
     @meta('Foto da Segunda Placa Traseira', renderer='images/image')
     def get_foto_segunda_placa_traseira(self):
         return self.foto_segunda_placa_traseira
+
+    @meta('QrCode da Placa Dianteira', renderer='b64text')
+    def get_qrcode_placa_dianteira(self):
+        return self.qrcode_placa_dianteira
+
+    @meta('QrCode da Placa Traseira', renderer='b64text')
+    def get_qrcode_placa_traseira(self):
+        return self.qrcode_placa_traseira
+
+    @meta('QrCode da Segunda Placa Traseira', renderer='b64text')
+    def get_qrcode_segunda_placa_traseira(self):
+        return self.qrcode_segunda_placa_traseira
 
     @meta('Foto do Boletim de Ocorrência', renderer='images/image')
     def get_foto_boletim_ocorrencia(self):
