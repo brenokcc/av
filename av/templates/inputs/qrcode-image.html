@@ -46,7 +46,7 @@
 		document.getElementById('result{{name}}').innerHTML = ''
 		window.qrcode{{name}}.style.display = 'none';
 		window.qrimage{{name}}.style.display = 'none';
-		html5QrCode{{ name }}.start({ facingMode: "environment" }, { fps: 1, qrbox: { width: 300, height: 300 } }, onScanSuccess{{ name }});
+		html5QrCode{{ name }}.start({ facingMode: "environment" }, { fps: 1, qrbox: { width: 150, height: 150 } }, onScanSuccess{{ name }});
 		qrtimeout = setTimeout(function(){
 			html5QrCode{{ name }}.stop();
 			document.getElementById('result{{name}}').innerHTML = 'QR CODE NAO LIDO!';
