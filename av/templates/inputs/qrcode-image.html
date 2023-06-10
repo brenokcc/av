@@ -1,0 +1,55 @@
+<div id="reader{{ name }}" width="600px"></div>
+<button type="button" onclick="scan{{ name }}()" style="font-size:150%">Scan QrCode</button>
+<div align="center">
+    <div id="result{{name}}" style="max-width:100%;margin:30px;overflow-wrap:anywhere"></div>
+    <img id="qrcode{{name}}" style="display:none"></img>
+    <img id="qrimage{{name}}" style="display:none"></img>
+</div>
+{{ widget }}
+<script>
+    var qrtimeout = null;
+    var uint8ToBase64 = (arr) => btoa(Array(arr.length).fill('').map((_, i) => String.fromCharCode(arr[i])).join(''));
+	function onScanSuccess{{ name }}(decodedText, decodedResult) {
+		if(decodedText.length>0){
+			document.getElementById('result{{name}}').innerHTML = decodedText;
+			document.getElementById('qr-shaded-region').style.display = 'none';
+			window.qrcode{{name}}.src = document.getElementById('qr-canvas').toDataURL("image/png");
+            window.qrcode{{name}}.width=document.getElementById('qr-canvas').width;
+            window.qrcode{{name}}.height=document.getElementById('qr-canvas').height;
+			setTimeout(function(){
+                // window.qrcode{{name}}.style.display = 'block';
+                var video = document.getElementsByTagName('video')[0];
+                if(video){
+                    var temp = new Image();
+                    temp.src = window.qrcode{{name}}.src;
+                    var canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth * 0.75;
+                    canvas.height = video.videoHeight * 0.75;
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(temp, 0, 0, 100, 100);
+                    window.qrimage{{name}}.src = canvas.toDataURL("image/png");
+                    window.qrimage{{name}}.width=canvas.width;
+                    window.qrimage{{name}}.height=canvas.height;
+                    window.qrimage{{name}}.style.display = 'block';
+                    document.getElementById('id_{{name}}').value = decodedText+'|'+document.getElementById('qrimage{{ name }}').src.substring(22);
+                    console.log('Stoping...');
+                    html5QrCode{{ name }}.stop();
+                    clearTimeout(qrtimeout);
+                }
+            }, 3000);
+		}
+	}
+	function onScanFailure(error) {}
+	const html5QrCode{{ name }} = new Html5Qrcode("reader{{ name }}");
+	function scan{{ name }}(){
+		document.getElementById('result{{name}}').innerHTML = ''
+		window.qrcode{{name}}.style.display = 'none';
+		window.qrimage{{name}}.style.display = 'none';
+		html5QrCode{{ name }}.start({ facingMode: "environment" }, { fps: 1, qrbox: { width: 300, height: 300 } }, onScanSuccess{{ name }});
+		qrtimeout = setTimeout(function(){
+			html5QrCode{{ name }}.stop();
+			document.getElementById('result{{name}}').innerHTML = 'QR CODE NAO LIDO!';
+		}, 15000);
+	}
+</script>
