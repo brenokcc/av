@@ -391,7 +391,7 @@ class Validacao(models.Model):
 
     @meta('Consultas')
     def get_consultas(self):
-        return self.consulta_set.display('tipo', 'data_hora', 'get_valor', 'get_valida').actions('view', 'invalidar_consulta')
+        return self.consulta_set.display('tipo', 'data_hora', 'get_valor', 'url', 'get_valida').actions('view', 'invalidar_consulta')
 
     @meta('Verificações')
     def get_verificacoes(self):
@@ -535,7 +535,7 @@ class Consulta(models.Model):
         }
         
     def __str__(self):
-        return '{}'.format(self.pk)
+        return 'Consulta {}'.format(self.pk)
 
     def get_valor(self):
         valor = self.valor
