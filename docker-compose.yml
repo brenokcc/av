@@ -51,3 +51,5 @@ services:
     hostname: geckodriver
     ports:
       - "4444"
+    entrypoint:
+      - geckodriver --binary=/opt/firefox/firefox --log=debug --host 0.0.0.0
