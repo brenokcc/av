@@ -14,3 +14,7 @@ class Service():
         response = requests.post(os.environ['FACE_RECOGNIZER_URL'], json=dict(url1=url1, url2=url2))
         print(response.text)
         return response.text
+
+    def test(self):
+        url = 'https://portalpopline.com.br/wp-content/uploads/2022/05/tom-cruise-homem-de-ferro-2.jpg'
+        return self.match(url, url) == 'MATCH'

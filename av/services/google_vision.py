@@ -75,6 +75,10 @@ class Service():
                     missing.append(token)
         return missing
 
+    def test(self):
+        url = 'https://av.cloud.aplicativo.click/media/fotos/1685977179504_PHEGA2R.png'
+        return 'QGZ' in self.detect_text(url)
+
 
 def unidecode(text):
     return unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode()

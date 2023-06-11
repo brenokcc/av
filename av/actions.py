@@ -15,6 +15,20 @@ class QrCodeImageInput(widgets.Textarea):
         return mark_safe(output)
 
 
+class CurrentLatitude(widgets.TextInput):
+
+    def render(self, name, value, attrs=None, **kwargs):
+        widget = super().render(name, value, attrs=attrs, **kwargs)
+        return mark_safe(render_to_string('inputs/current-latitude.html', dict(widget=widget, name=name)))
+
+
+class CurrentLongitude(widgets.TextInput):
+
+    def render(self, name, value, attrs=None, **kwargs):
+        widget = super().render(name, value, attrs=attrs, **kwargs)
+        return mark_safe(render_to_string('inputs/current-longitude.html', dict(widget=widget, name=name)))
+
+
 class CadastrarValidacao(actions.Action):
     class Meta:
         model = Validacao
@@ -27,6 +41,8 @@ class CadastrarValidacao(actions.Action):
         super().__init__(*args, **kwargs)
         for name in ['qrcode_placa_dianteira', 'qrcode_placa_traseira', 'qrcode_segunda_placa_traseira']:
             self.fields[name].widget = QrCodeImageInput()
+        self.fields['latitude'].widget = CurrentLatitude()
+        self.fields['longitude'].widget = CurrentLongitude()
 
     def submit(self):
         super().submit()
@@ -47,6 +63,8 @@ class AlterarValidacao(actions.Action):
         super().__init__(*args, **kwargs)
         for name in ['qrcode_placa_dianteira', 'qrcode_placa_traseira', 'qrcode_segunda_placa_traseira']:
             self.fields[name].widget = QrCodeImageInput()
+        self.fields['latitude'].widget = CurrentLatitude()
+        self.fields['longitude'].widget = CurrentLongitude()
 
     def submit(self):
         super().submit()

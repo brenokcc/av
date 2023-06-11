@@ -30,3 +30,7 @@ class Service():
         br.quit()
         print(marca)
         return marca
+
+    def test(self):
+        url = 'https://av.cloud.aplicativo.click/media/fotos/1685975118796_emRFCt1.png'
+        return self.detect_brand(url).upper() == 'Hyundai HB20'.upper()

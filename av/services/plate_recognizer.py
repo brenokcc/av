@@ -34,3 +34,7 @@ class Service():
             plate = '{}-{}'.format(plate[0:3], plate[3:])
             return plate
         return None
+
+    def test(self):
+        url = 'https://av.cloud.aplicativo.click/media/fotos/1685975118796_97NeDBC.png'
+        return self.detect_plate(url) == 'OWE-6J00'

@@ -4,9 +4,9 @@ from PIL import Image
 
 """
 from av.services.google_lens import Service
-url = 'https://av.cloud.aplicativo.click/media/fotos/1685975118796_emRFCt1.png'
+url = 'https://av.cloud.aplicativo.click/media/fotos/1686159329549.png'
 service = Service()
-service.detect_brand(url)
+service.verify(url)
 """
 
 class Service():
@@ -26,3 +26,7 @@ class Service():
         response = requests.post(url, data=data, headers={'Content-Type': 'image/jpeg'})
         print(response.text)
         return 'MATCH' if response.json().get('passed') else 'NOT MATCH'
+
+    def test(self):
+        url = 'https://av.cloud.aplicativo.click/media/fotos/1686159329549.png'
+        return self.verify(url) == 'MATCH'

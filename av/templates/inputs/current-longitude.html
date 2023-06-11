@@ -1,0 +1,10 @@
+{{ widget }}
+<script>
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position){
+                document.getElementById('id_{{ name }}').value = position.coords.longitude;
+            }
+        );
+    }
+</script>
