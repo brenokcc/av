@@ -18,10 +18,12 @@ print(Service().detect_vin(url))
 class Service():
     def detect_vin(self, uri):
         if uri.startswith('http'):
-            uri = tempfile.mktemp(suffix='.png')
-            open(uri, 'wb').write(requests.get(uri))
-        elif not uri.startswith('/'):
-            uri = os.path.join(settings.BASE_DIR, uri)
+            file_path = tempfile.mktemp(suffix='.png')
+            open(file_path, 'wb').write(requests.get(uri).content)
+        elif uri.startswith('/'):
+            file_path = uri
+        else:
+            file_path = os.path.join(settings.BASE_DIR, uri)
         options = webdriver.FirefoxOptions()
         options.add_argument("--headless")
         if os.path.exists('/usr/local/bin/geckodriver'):
@@ -32,7 +34,7 @@ class Service():
         try:
             i = 0
             br.get(url)
-            br.find_element(By.ID, 'fileUpload').send_keys(uri)
+            br.find_element(By.ID, 'fileUpload').send_keys(file_path)
             br.find_element(By.ID, 'btnUploadImage1').click()
             data = {}
             while i < 10 and not data:
