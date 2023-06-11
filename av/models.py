@@ -391,7 +391,7 @@ class Validacao(models.Model):
 
     @meta('Consultas')
     def get_consultas(self):
-        return self.consulta_set.display('tipo', 'data_hora', 'get_valor', 'get_valida').actions('view')
+        return self.consulta_set.display('tipo', 'data_hora', 'get_valor', 'get_valida').actions('view', 'invalidar_consulta')
 
     @meta('Verificações')
     def get_verificacoes(self):
@@ -489,7 +489,7 @@ class Validacao(models.Model):
         super().save(*args, **kwargs)
         if update:
             Validacao.objects.filter(pk=self.pk).update(**update)
-
+        self.gerar_verificacoes()
 
 
 class ConsultaManager(models.Manager):

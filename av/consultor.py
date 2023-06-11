@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from .services import google_vision, google_lens, face_recognizer, liveness, plate_recognizer, eyedea
+from .services import google_vision, google_lens, face_recognizer, liveness, plate_recognizer, eyedea, vinocr
 from .models import Consulta, Validacao
 
 def consultar_foto_operador(validacao):
@@ -36,7 +36,7 @@ def consultar_foto_proprietario(validacao):
     url2 = validacao.get_url('foto_documento_proprietario')
     if url1 and url2 and not validacao.consulta_set.filter(tipo=Consulta.FOTO_PROPRIETARIO, valida=True).exists():
         print('Verificando foto do proprietário...')
-        consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
+        consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url1)
         consulta.tipo = Consulta.FOTO_PROPRIETARIO
         consulta.valor = face_recognizer.Service().match(url1, url2)
         consulta.save()
@@ -64,7 +64,7 @@ def consultar_foto_representante(validacao):
     url2 = validacao.get_url('foto_documento_representante')
     if url1 and url2 and not validacao.consulta_set.filter(tipo=Consulta.FOTO_REPRESENTANTE, valida=True).exists():
         print('Verificando foto do representante...')
-        consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
+        consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url1)
         consulta.tipo = Consulta.FOTO_REPRESENTANTE
         consulta.valor = face_recognizer.Service().match(url1, url2)
         consulta.save()
@@ -147,7 +147,7 @@ def consultar_numero_chassi(validacao):
         print('Verificando número do chassi...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.NUMERO_CHASSI
-        consulta.valor = google_vision.Service().detect_text(url)
+        consulta.valor = vinocr.Service().detect_vin(url)
         consulta.save()
 
 def consultar_caracteristicas_chassi(validacao):

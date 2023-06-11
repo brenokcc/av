@@ -86,3 +86,20 @@ class Validar(actions.Action):
 
     def has_permission(self, user):
         return user.is_superuser or user.roles.contains(ADM)
+
+
+class InvalidarConsulta(actions.Action):
+    class Meta:
+        icon = 'trash'
+        verbose_name = 'Invalidar Consulta'
+        modal = True
+        style = 'warning'
+
+    def submit(self):
+        self.instance.valida = False
+        self.instance.save()
+        super().submit()
+
+    def has_permission(self, user):
+        return user.is_superuser or user.roles.contains(ADM)
+
