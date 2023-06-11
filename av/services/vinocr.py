@@ -21,13 +21,13 @@ class Service():
             open(uri, 'wb').write(requests.get(uri))
         elif not uri.startswith('/'):
             uri = os.path.join(settings.BASE_DIR, uri)
-        service = None
         options = webdriver.FirefoxOptions()
         options.add_argument("--headless")
-        if not os.path.exists('/usr/local/bin/geckodriver'):
-            service = webdriver.firefox.service.Service('geckodriver', port=4444)
+        if os.path.exists('/usr/local/bin/geckodriver'):
+            br = webdriver.Firefox(options=options)
+        else:
+            br = webdriver.Remote(command_executor='http://geckodriver:4444/wd/hub', options=options)
         url = 'https://www.recognition.ws/service_vinocr_v2_demo.html'
-        br = webdriver.Firefox(service=service, options=options)
         try:
             i = 0
             br.get(url)
