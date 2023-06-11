@@ -46,3 +46,8 @@ services:
     hostname: weasyprint
     ports:
       - "8888"
+  geckodriver:
+    image: instrumentisto/geckodriver
+    hostname: geckodriver
+    ports:
+      - "4444"
