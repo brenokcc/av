@@ -46,11 +46,3 @@ services:
     hostname: weasyprint
     ports:
       - "8888"
-  geckodriver:
-    image: instrumentisto/geckodriver
-    hostname: geckodriver
-    ports:
-      - "4444"
-    entrypoint: ["geckodriver", "--binary=/opt/firefox/firefox", "--log=debug", "--host=geckodriver"]
-    volumes:
-      - .docker/media:/opt/app/media

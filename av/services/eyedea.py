@@ -1,8 +1,6 @@
-import os
 import json
+import os
 import requests
-from pathlib import Path
-from typing import Optional
 
 """
 from av.services.eyedea import Service
