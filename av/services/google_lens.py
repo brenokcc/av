@@ -11,9 +11,8 @@ service.detect_brand(url)
 
 class Service():
     def detect_brand(self, url):
-        url = 'http://lens.aplicativo.click'
         data = {"url": url, "token": os.environ['LENS_TOKEN']}
-        data = requests.post(url, json=data).json()
+        data = requests.post('http://lens.aplicativo.click', json=data).json()
         print(data)
         return data.get('text')
 

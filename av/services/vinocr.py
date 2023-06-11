@@ -9,9 +9,8 @@ print(Service().detect_vin(url))
 
 class Service():
     def detect_vin(self, uri):
-        url = 'http://vinocr.aplicativo.click'
-        data = {"url": url, "token": os.environ['VINOCR_TOKEN']}
-        data = requests.post(url, json=data).json()
+        data = {"url": uri, "token": os.environ['VINOCR_TOKEN']}
+        data = requests.post('http://vinocr.aplicativo.click', json=data).json()
         print(data)
         return data.get('vin')
 
