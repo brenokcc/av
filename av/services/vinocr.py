@@ -1,6 +1,7 @@
 import os.path
 import time
 import json
+import requests
 import tempfile
 from selenium.webdriver.common.by import By
 from django.conf import settings
@@ -9,13 +10,13 @@ from selenium.common.exceptions import NoSuchElementException
 """
 from av.services.vinocr import Service
 url = 'https://av.cloud.aplicativo.click/media/fotos/1685977179504_QJBA2gl.png'
-print(Service().detect_vin())
+print(Service().detect_vin(url))
 """
 
 # docker run -d --network=host instrumentisto/geckodriver
 
 class Service():
-    def detect_vin(self, uri='av/static/images/chassi.png'):
+    def detect_vin(self, uri):
         if uri.startswith('http'):
             uri = tempfile.mktemp(suffix='.png')
             open(uri, 'wb').write(requests.get(uri))
@@ -26,7 +27,7 @@ class Service():
         if os.path.exists('/usr/local/bin/geckodriver'):
             br = webdriver.Firefox(options=options)
         else:
-            br = webdriver.Remote(command_executor='http://geckodriver:4444/wd/hub', options=options)
+            br = webdriver.Remote(command_executor='http://geckodriver:4444', options=options)
         url = 'https://www.recognition.ws/service_vinocr_v2_demo.html'
         try:
             i = 0
@@ -42,7 +43,7 @@ class Service():
         except NoSuchElementException:
             vin = ''
         br.close()
-        br.quit()
+        # br.quit()
         print(vin)
         return vin
 
