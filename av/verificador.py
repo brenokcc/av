@@ -30,26 +30,27 @@ def verificar_compatibilidade(verificacao, consulta):
       verificacao.save()
 
 def verificar_rotulos_chassi(verificacao, consulta):
-   labels = json.loads(consulta.valor)
-   for label in labels:
-      if label.upper() in INVALID_CHASSI_LABELS:
-         verificacao.satisfeita = False
-         verificacao.observacao = 'Não deveria possuir rótulo "{}"'.format(label.upper())
+   if consulta:
+      labels = json.loads(consulta.valor)
+      for label in labels:
+         if label.upper() in INVALID_CHASSI_LABELS:
+            verificacao.satisfeita = False
+            verificacao.observacao = 'Não deveria possuir rótulo "{}"'.format(label.upper())
+            verificacao.save()
+            return
+      has_valid = False
+      for label in VALID_CHASSI_LABELS:
+         if label.upper() in labels:
+            has_valid = True
+            break
+      if has_valid:
+         verificacao.satisfeita = True
+         verificacao.observacao = None
          verificacao.save()
-         return
-   has_valid = False
-   for label in VALID_CHASSI_LABELS:
-      if label.upper() in labels:
-         has_valid = True
-         break
-   if has_valid:
-      verificacao.satisfeita = True
-      verificacao.observacao = None
-      verificacao.save()
-   else:
-      verificacao.satisfeita = False
-      verificacao.observacao = 'Deveria possuir um dos rótulos {}'.format(VALID_CHASSI_LABELS)
-      verificacao.save()
+      else:
+         verificacao.satisfeita = False
+         verificacao.observacao = 'Deveria possuir um dos rótulos {}'.format(VALID_CHASSI_LABELS)
+         verificacao.save()
 
 def verificar_geolocalizacao(verificacao):
    if verificacao.validacao.estampador and verificacao.validacao.latitude and verificacao.validacao.longitude:

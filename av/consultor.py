@@ -3,6 +3,8 @@ from datetime import datetime
 from .services import google_vision, google_lens, face_recognizer, liveness, plate_recognizer, eyedea, vinocr
 from .models import Consulta, Validacao
 
+FAKE = False
+
 def consultar_foto_operador(validacao):
     url1 = validacao.get_url('foto_perfil_operador')
     url2 = validacao.operador.get_url_foto()
@@ -12,7 +14,7 @@ def consultar_foto_operador(validacao):
         print('Verificando foto do operador...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url1)
         consulta.tipo = Consulta.FOTO_OPERADOR
-        consulta.valor = 'MATCH' or face_recognizer.Service().match(url1, url2)
+        consulta.valor = '{}' if FAKE else 'MATCH' or face_recognizer.Service().match(url1, url2)
         consulta.save()
 
 def consultar_presenca_operador(validacao):
@@ -23,7 +25,7 @@ def consultar_presenca_operador(validacao):
         print('Verificando a presença do operador...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.PRESENCA_OPERADOR
-        consulta.valor = liveness.Service().verify(url)
+        consulta.valor = '{}' if FAKE else liveness.Service().verify(url)
         consulta.save()
 
 def consultar_documento_proprietario(validacao):
@@ -34,7 +36,7 @@ def consultar_documento_proprietario(validacao):
         print('Verificando documento do proprietário...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.DOCUMENTO_PROPRIETARIO
-        consulta.valor = google_vision.Service().detect_text(url)
+        consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
         consulta.save()
 
 def consultar_foto_proprietario(validacao):
@@ -46,7 +48,7 @@ def consultar_foto_proprietario(validacao):
         print('Verificando foto do proprietário...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url1)
         consulta.tipo = Consulta.FOTO_PROPRIETARIO
-        consulta.valor = face_recognizer.Service().match(url1, url2)
+        consulta.valor = '{}' if FAKE else face_recognizer.Service().match(url1, url2)
         consulta.save()
 
 def consultar_presenca_proprietario(validacao):
@@ -57,7 +59,7 @@ def consultar_presenca_proprietario(validacao):
         print('Verificando a presença do proprietário...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.PRESENCA_PROPRIETARIO
-        consulta.valor = liveness.Service().verify(url)
+        consulta.valor = '{}' if FAKE else liveness.Service().verify(url)
         consulta.save()
 
 def consultar_documento_representante(validacao):
@@ -68,7 +70,7 @@ def consultar_documento_representante(validacao):
         print('Verificando documento do representante...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.DOCUMENTO_REPRESENTANTE
-        consulta.valor = google_vision.Service().detect_text(url)
+        consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
         consulta.save()
 
 def consultar_foto_representante(validacao):
@@ -80,7 +82,7 @@ def consultar_foto_representante(validacao):
         print('Verificando foto do representante...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url1)
         consulta.tipo = Consulta.FOTO_REPRESENTANTE
-        consulta.valor = face_recognizer.Service().match(url1, url2)
+        consulta.valor = '{}' if FAKE else face_recognizer.Service().match(url1, url2)
         consulta.save()
 
 def consultar_marca_foto_dianteira(validacao):
@@ -91,7 +93,7 @@ def consultar_marca_foto_dianteira(validacao):
         print('Verificando foto dianteira do veículo...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.MARCA_FOTO_DIANTEIRA
-        consulta.valor = google_lens.Service().detect_brand(url)
+        consulta.valor = '{}' if FAKE else google_lens.Service().detect_brand(url)
         consulta.save()
 
 def consultar_marca_foto_traseira(validacao):
@@ -102,7 +104,7 @@ def consultar_marca_foto_traseira(validacao):
         print('Verificando foto traseira do veículo...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.MARCA_FOTO_TRASEIRA
-        consulta.valor = google_lens.Service().detect_brand(url)
+        consulta.valor = '{}' if FAKE else google_lens.Service().detect_brand(url)
         consulta.save()
 
 def consultar_foto_placa_dianteira(validacao):
@@ -113,7 +115,7 @@ def consultar_foto_placa_dianteira(validacao):
         print('Verificando foto da placa dianteira...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.FOTO_PLACA_DIANTEIRA
-        consulta.valor = plate_recognizer.Service().detect_plate(url)
+        consulta.valor = '{}' if FAKE else plate_recognizer.Service().detect_plate(url)
         consulta.save()
 
 def consultar_foto_placa_traseira(validacao):
@@ -124,7 +126,7 @@ def consultar_foto_placa_traseira(validacao):
         print('Verificando foto da placa traseira...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.FOTO_PLACA_TRASEIRA
-        consulta.valor = google_vision.Service().detect_text(url)
+        consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
         consulta.save()
 
 def consultar_foto_segunda_placa_traseira(validacao):
@@ -135,7 +137,7 @@ def consultar_foto_segunda_placa_traseira(validacao):
         print('Verificando foto da segunda placa traseira...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.FOTO_SEGUNDA_PLACA_TRASEIRA
-        consulta.valor = google_vision.Service().detect_text(url)
+        consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
         consulta.save()
 
 def consultar_ocr_placa_dianteira(validacao):
@@ -146,7 +148,7 @@ def consultar_ocr_placa_dianteira(validacao):
         print('Verificando OCR da foto da placa dianteira...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.OCR_PLACA_DIANTEIRA
-        consulta.valor = google_vision.Service().detect_text(url)
+        consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
         consulta.save()
 
 def consultar_ocr_placa_traseira(validacao):
@@ -157,7 +159,7 @@ def consultar_ocr_placa_traseira(validacao):
         print('Verificando OCR da foto da placa traseira...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.OCR_PLACA_TRASEIRA
-        consulta.valor = google_vision.Service().detect_text(url)
+        consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
         consulta.save()
 
 def consultar_ocr_segunda_placa_traseira(validacao):
@@ -168,7 +170,7 @@ def consultar_ocr_segunda_placa_traseira(validacao):
         print('Verificando OCR da foto da segunda placa traseira...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.OCR_SEGUNDA_PLACA_TRASEIRA
-        consulta.valor = google_vision.Service().detect_text(url)
+        consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
         consulta.save()
 
 def consultar_numero_chassi(validacao):
@@ -179,7 +181,7 @@ def consultar_numero_chassi(validacao):
         print('Verificando número do chassi...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.NUMERO_CHASSI
-        consulta.valor = vinocr.Service().detect_vin(url)
+        consulta.valor = '{}' if FAKE else vinocr.Service().detect_vin(url)
         consulta.save()
 
 def consultar_caracteristicas_chassi(validacao):
@@ -190,7 +192,7 @@ def consultar_caracteristicas_chassi(validacao):
         print('Verificando características do chassi...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.CARACTERISTICAS_CHASSI
-        consulta.valor = json.dumps(google_vision.Service().detect_labels(url)).upper()
+        consulta.valor = '{}' if FAKE else json.dumps(google_vision.Service().detect_labels(url)).upper()
         consulta.save()
 
 def consultar_cor_veiculo(validacao):
@@ -201,7 +203,7 @@ def consultar_cor_veiculo(validacao):
         print('Verificando cor do veículo...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.COR_VEICULO
-        consulta.valor = eyedea.Service().detect_color(url)
+        consulta.valor = '{}' if FAKE else eyedea.Service().detect_color(url)
         consulta.save()
 
 def consultar_servicos(validacao):

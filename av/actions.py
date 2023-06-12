@@ -1,5 +1,6 @@
 from sloth import actions
 from .models import Validacao
+from . import tasks
 from .roles import ADM
 from django.forms import widgets
 from django.template.loader import render_to_string
@@ -39,35 +40,40 @@ class CadastrarValidacao(actions.Action):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for name in ['qrcode_placa_dianteira', 'qrcode_placa_traseira', 'qrcode_segunda_placa_traseira']:
-            self.fields[name].widget = QrCodeImageInput()
         self.fields['latitude'].widget = CurrentLatitude()
         self.fields['longitude'].widget = CurrentLongitude()
 
     def submit(self):
         super().submit()
+        self.redirect('/app/dashboard/{}/'.format(self.instance.pk))
 
     def has_permission(self, user):
         return user.roles.contains(ADM) or user.is_superuser
 
 
-class AlterarValidacao(actions.Action):
+class EnviarFotos(actions.Action):
     class Meta:
+        icon = 'camera'
         model = Validacao
-        verbose_name = 'Realizar Alteração'
+        verbose_name = 'Fotos'
         modal = False
         style = 'primary'
-        fieldsets = Validacao.metaclass().fieldsets
+        fieldsets = {
+            'Proprietário': ('foto_perfil_proprietario', 'foto_documento_proprietario'),
+            'Representante': ('foto_perfil_representante', 'foto_documento_representante', 'foto_procuracao'),
+            'Fotos do Veículo': ('foto_chassi_veiculo', 'foto_dianteira_veiculo', 'foto_traseira_veiculo'),
+            'Fotos das Placas': ('qrcode_placa_dianteira', 'qrcode_placa_traseira', 'qrcode_segunda_placa_traseira'),
+            'Fotos do Descarte': ('foto_boletim_ocorrencia', 'foto_descarte_placa_dianteira', 'foto_descarte_placa_traseira', 'foto_descarte_segunda_placa_traseira'),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for name in ['qrcode_placa_dianteira', 'qrcode_placa_traseira', 'qrcode_segunda_placa_traseira']:
             self.fields[name].widget = QrCodeImageInput()
-        self.fields['latitude'].widget = CurrentLatitude()
-        self.fields['longitude'].widget = CurrentLongitude()
 
     def submit(self):
         super().submit()
+        tasks.Validar(self.instance).start(self.request)
 
     def has_permission(self, user):
         return user.roles.contains(ADM) or user.is_superuser
@@ -85,7 +91,7 @@ class Validar(actions.Action):
         super().submit()
 
     def has_permission(self, user):
-        return user.is_superuser or user.roles.contains(ADM)
+        return user.is_superuser
 
 
 class InvalidarConsulta(actions.Action):
@@ -101,5 +107,5 @@ class InvalidarConsulta(actions.Action):
         super().submit()
 
     def has_permission(self, user):
-        return user.is_superuser or user.roles.contains(ADM)
+        return user.is_superuser
 

@@ -272,11 +272,8 @@ class Validacao(models.Model):
             'Dados Gerais': ('estampador', ('placa', 'chassi'), ('marca', 'cor')),
             'Operador': ('operador', 'foto_perfil_operador'),
             'Localização': (('latitude', 'longitude'),),
-            'Proprietário': (('cpf_proprietario', 'nome_proprietario'), 'foto_perfil_proprietario', 'foto_documento_proprietario'),
-            'Representante': (('cpf_representante', 'nome_representante'), 'foto_perfil_representante', 'foto_documento_representante', 'foto_procuracao'),
-            'Fotos do Veículo': ('foto_chassi_veiculo', 'foto_dianteira_veiculo', 'foto_traseira_veiculo'),
-            'Fotos das Placas': ('qrcode_placa_dianteira', 'qrcode_placa_traseira', 'qrcode_segunda_placa_traseira'),
-            'Fotos do Descarte': ('foto_boletim_ocorrencia', 'foto_descarte_placa_dianteira', 'foto_descarte_placa_traseira', 'foto_descarte_segunda_placa_traseira'),
+            'Proprietário': (('cpf_proprietario', 'nome_proprietario'),),
+            'Representante': (('cpf_representante', 'nome_representante'),),
         }
 
     def get_dados_gerais(self):
@@ -391,15 +388,18 @@ class Validacao(models.Model):
 
     @meta('Consultas')
     def get_consultas(self):
-        return self.consulta_set.display('tipo', 'data_hora', 'get_valor', 'url', 'get_valida').actions('view', 'invalidar_consulta')
+        return self.consulta_set.ignore('validacao').display('tipo', 'data_hora', 'get_valor', 'get_url', 'get_valida').actions('view', 'invalidar_consulta').limit_per_page(50).expand()
 
     @meta('Verificações')
     def get_verificacoes(self):
-        return self.verificacao_set.display('descricao', 'get_satisfeita', 'observacao')
+        return self.verificacao_set.ignore('validacao').display('descricao', 'get_satisfeita', 'observacao').expand()
+
+    @meta('Validação')
+    def get_validacao(self):
+        return self.value_set('get_verificacoes', 'get_consultas').actions('validar')
 
     def view(self):
-        # self.consultar()
-        return self.value_set('get_dados_gerais', 'get_localizacao', 'get_operador', 'get_proprietario', 'get_representante', 'get_fotos_veiculo', 'get_qrcode_placas', 'get_fotos_placas', 'get_fotos_descarte', 'get_consultas', 'get_verificacoes').actions('validar', 'alterar_validacao')
+        return self.value_set('get_dados_gerais', 'get_localizacao', 'get_operador', 'get_proprietario', 'get_representante', 'get_fotos_veiculo', 'get_qrcode_placas', 'get_fotos_placas', 'get_fotos_descarte', 'get_validacao').actions('enviar_fotos')
 
     def __str__(self):
         return '{}'.format(self.placa)
@@ -546,9 +546,13 @@ class Consulta(models.Model):
     @meta('Válida', renderer='badges/boolean')
     def get_valida(self):
         return self.valida
-        
+
+    @meta('Foto', renderer='documents/popup')
+    def get_url(self):
+        return self.url
+
     def has_permission(self, user):
-        return user.is_superuser
+        return user.is_superuser or user.roles.contains(ADM)
 
 
 class VerificacaoManager(models.Manager):
