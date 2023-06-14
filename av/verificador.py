@@ -138,6 +138,10 @@ def verificar_assinatura_procuracao(verificacao):
 def verificar_numero_chassi(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.NUMERO_CHASSI).first()
    verificar_palavras(verificacao, consulta, verificacao.validacao.chassi)
+   if not verificacao.satisfeita:
+      consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.NUMERO_CHASSI_2).first()
+      verificar_palavras(verificacao, consulta, verificacao.validacao.chassi)
+
 
 def verificar_caracteristica_chassi(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.CARACTERISTICAS_CHASSI).first()

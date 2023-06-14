@@ -518,6 +518,7 @@ class Consulta(models.Model):
     OCR_PLACA_TRASEIRA = 'OCR da Placa Traseira'
     OCR_SEGUNDA_PLACA_TRASEIRA = 'OCR da Segunda Placa Traseira'
     NUMERO_CHASSI = 'Número do Chassi'
+    NUMERO_CHASSI_2 = 'Número do Chassi 2'
     CARACTERISTICAS_CHASSI = 'Características do Chassi'
     COR_VEICULO = 'Cor do Veículo'
     PROCURACAO = 'Procuração'

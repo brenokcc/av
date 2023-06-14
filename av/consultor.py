@@ -184,6 +184,17 @@ def consultar_numero_chassi(validacao):
         consulta.valor = '{}' if FAKE else vinocr.Service().detect_vin(url)
         consulta.save()
 
+def consultar_numero_chassi2(validacao):
+    url = validacao.get_url('foto_chassi_veiculo')
+    qs = validacao.consulta_set.filter(tipo=Consulta.NUMERO_CHASSI_2, valida=True)
+    if url and not qs.filter(url=url).exists():
+        qs.update(valida=False)
+        print('Verificando número do chassi...')
+        consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
+        consulta.tipo = Consulta.NUMERO_CHASSI_2
+        consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
+        consulta.save()
+
 def consultar_caracteristicas_chassi(validacao):
     url = validacao.get_url('foto_chassi_veiculo')
     qs = validacao.consulta_set.filter(tipo=Consulta.CARACTERISTICAS_CHASSI, valida=True)
@@ -247,6 +258,7 @@ def consultar_servicos(validacao):
     consultar_ocr_placa_traseira(validacao)
     consultar_ocr_segunda_placa_traseira(validacao)
     consultar_numero_chassi(validacao)
+    consultar_numero_chassi2(validacao)
     consultar_caracteristicas_chassi(validacao)
     consultar_presenca_proprietario(validacao)
     consultar_cor_veiculo(validacao)
