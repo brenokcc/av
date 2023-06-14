@@ -17,7 +17,7 @@ class AppDashboard(Dashboard):
         self.tools_menu('show_icons')
         self.footer(title='© 2022 Sigplac', text='Todos os direitos reservados', version='1.0.0')
 
-        self.top_menu('av.fabricante', 'av.marca', 'av.cor', 'av.estampador', 'av.validacao')
+        self.top_menu('av.fabricante', 'av.marca', 'av.cor', 'av.codigocor', 'av.estampador', 'av.validacao')
 
     def view(self):
         return self.objects('av.validacao').all().actions('view').global_actions('cadastrar_validacao')

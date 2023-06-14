@@ -196,7 +196,7 @@ class Cor(models.Model):
 
 class CodigoCorManager(models.Manager):
     def all(self):
-        return self.display('nome', 'cores')
+        return self.lookups(ADM).display('nome', 'cores')
 
 
 class CodigoCor(models.Model):
@@ -214,6 +214,9 @@ class CodigoCor(models.Model):
 
     def has_permission(self, user):
         return user.is_superuser
+
+    def has_permission(self, user):
+        return user.is_superuser or user.roles.contains(ADM)
 
 
 
@@ -392,7 +395,7 @@ class Validacao(models.Model):
 
     @meta('Verificações')
     def get_verificacoes(self):
-        return self.verificacao_set.ignore('validacao').display('descricao', 'get_satisfeita', 'observacao').expand()
+        return self.verificacao_set.ignore('validacao').display('descricao', 'get_satisfeita', 'observacao').limit_per_page(50).expand()
 
     @meta('Validação')
     def get_validacao(self):

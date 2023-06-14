@@ -1,5 +1,6 @@
 import json
 from .models import Verificacao, Consulta, Cor, CodigoCor
+import unicodedata
 
 MAX_DISTANCE = 100
 COLORS = {'WHITE': 'BRANCA', 'BLACK': 'PRETA', 'SILVER': 'PRATA', 'RED': 'VERMELHA', 'GRAY': 'CINZA', 'GREY': 'CINZA', 'YELLOW': 'AMARELA', 'BLUE': 'AZUL', 'GREEN': 'VERDE', 'BROWN': 'MARROM', 'ORANGE': 'LARANJA', 'BEIGE': 'BEGE', 'GOLDEN': 'DOURADA', 'FANTASY': 'FANTASIA', 'PURPLE': 'ROXA', 'PINK': 'ROSA'}
@@ -9,8 +10,10 @@ INVALID_CHASSI_LABELS = ['RECTANGLE', 'PATTERN', 'PAPER PRODUCT', 'EYEWEAR', 'PA
 def verificar_palavras(verificacao, consulta, texto):
    ausentes = []
    if consulta:
+      texto = unicodedata.normalize('NFKD', texto).encode('ASCII', 'ignore').decode()
+      valor = unicodedata.normalize('NFKD', consulta.valor).encode('ASCII', 'ignore').decode()
       for palavra in texto.split() if texto else []:
-         if palavra not in consulta.valor:
+         if palavra not in valor:
             ausentes.append(palavra)
       if ausentes:
          verificacao.satisfeita = False
