@@ -250,3 +250,5 @@ def consultar_servicos(validacao):
     consultar_caracteristicas_chassi(validacao)
     consultar_presenca_proprietario(validacao)
     consultar_cor_veiculo(validacao)
+    consultar_procuracao(validacao)
+    consultar_boletim_ocorrencia(validacao)
