@@ -520,6 +520,8 @@ class Consulta(models.Model):
     NUMERO_CHASSI = 'Número do Chassi'
     CARACTERISTICAS_CHASSI = 'Características do Chassi'
     COR_VEICULO = 'Cor do Veículo'
+    PROCURACAO = 'Procuração'
+    BOLETIM_OCORRENCIA = 'Boletim de Ocorrência'
 
     validacao = models.ForeignKey(Validacao, verbose_name='Validação')
     tipo = models.CharField('Tipo')

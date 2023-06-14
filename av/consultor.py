@@ -206,6 +206,31 @@ def consultar_cor_veiculo(validacao):
         consulta.valor = '{}' if FAKE else eyedea.Service().detect_color(url)
         consulta.save()
 
+
+def consultar_procuracao(validacao):
+    url = validacao.get_url('foto_procuracao')
+    qs = validacao.consulta_set.filter(tipo=Consulta.PROCURACAO, valida=True)
+    if url and not qs.filter(url=url).exists():
+        qs.update(valida=False)
+        print('Verificando procuração...')
+        consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
+        consulta.tipo = Consulta.PROCURACAO
+        consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
+        consulta.save()
+
+
+def consultar_boletim_ocorrencia(validacao):
+    url = validacao.get_url('foto_boletim_ocorrencia')
+    qs = validacao.consulta_set.filter(tipo=Consulta.BOLETIM_OCORRENCIA, valida=True)
+    if url and not qs.filter(url=url).exists():
+        qs.update(valida=False)
+        print('Verificando boletim de ocorrência...')
+        consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
+        consulta.tipo = Consulta.BOLETIM_OCORRENCIA
+        consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
+        consulta.save()
+
+
 def consultar_servicos(validacao):
     consultar_foto_operador(validacao)
     consultar_presenca_operador(validacao)

@@ -100,29 +100,37 @@ def verificar_presenca_proprietario(verificacao):
    verificar_compatibilidade(verificacao, consulta)
 
 def verificar_nome_representante(verificacao):
-   pass
+   consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.DOCUMENTO_REPRESENTANTE).first()
+   verificar_palavras(verificacao, consulta, verificacao.validacao.nome_representante.upper())
 
 
 def verificar_cpf_representante(verificacao):
-   pass
+   consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.DOCUMENTO_REPRESENTANTE).first()
+   verificar_palavras(verificacao, consulta, verificacao.validacao.cpf_representante.upper())
 
 def verificar_reconhecimento_representante(verificacao):
-   pass
+   consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.FOTO_REPRESENTANTE).first()
+   verificar_compatibilidade(verificacao, consulta)
 
 def verificar_presenca_representante(verificacao):
-   pass
+   consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.PRESENCA_REPRESENTANTE).first()
+   verificar_compatibilidade(verificacao, consulta)
 
 def verificar_titulo_procuracao(verificacao):
-   pass
+   consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.PROCURACAO).first()
+   verificar_palavras(verificacao, consulta, 'PROCURAÇÃO')
 
 def verificar_dados_proprietario_procuracao(verificacao):
-   pass
+   consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.PROCURACAO).first()
+   verificar_palavras(verificacao, consulta, '{} {}'.format(verificacao.validacao.nome_proprietario, verificacao.validacao.cpf_proprietario).upper())
 
 def verificar_dados_representante_procuracao(verificacao):
-   pass
+   consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.PROCURACAO).first()
+   verificar_palavras(verificacao, consulta,'{} {}'.format(verificacao.validacao.nome_representante, verificacao.validacao.cpf_representante).upper())
 
 def verificar_placa_procuracao(verificacao):
-   pass
+   consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.PROCURACAO).first()
+   verificar_palavras(verificacao, consulta, verificacao.validacao.placa.upper())
 
 def verificar_assinatura_procuracao(verificacao):
    pass
@@ -196,13 +204,16 @@ def verificar_qrcode_segunda_placa_traseira(verificacao):
    pass
 
 def verificar_titulo_boletim_ocorrencia(verificacao):
-   pass
+   consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.BOLETIM_OCORRENCIA).first()
+   verificar_palavras(verificacao, consulta, 'BOLETIM DE OCORRÊNCIA')
 
 def verificar_dados_proprietario_boletim_ocorrencia(verificacao):
-   pass
+   consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.BOLETIM_OCORRENCIA).first()
+   verificar_palavras(verificacao, consulta, '{} {}'.format(verificacao.validacao.nome_proprietario, verificacao.validacao.cpf_proprietario).upper())
 
 def verificar_placa_boletim_ocorrencia(verificacao):
-   pass
+   consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.BOLETIM_OCORRENCIA).first()
+   verificar_palavras(verificacao, consulta, verificacao.validacao.placa.upper())
 
 def verificar_descarte_placa_dianteira(verificacao):
    pass
