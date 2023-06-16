@@ -176,7 +176,7 @@ def calcular_distancia(latitude, longitude):
 
 def verificar_numero_placa_dianteira(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.FOTO_PLACA_DIANTEIRA).first()
-   verificar_palavras(verificacao, consulta, '{} {}'.format(verificacao.validacao.placa.split('-')))
+   verificar_palavras(verificacao, consulta, '{} {}'.format(*verificacao.validacao.placa.split('-')))
 
 def verificar_itens_seguranca_placa_dianteira(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.OCR_PLACA_DIANTEIRA).first()
@@ -187,7 +187,7 @@ def verificar_qrcode_placa_dianteira(verificacao):
 
 def verificar_numero_placa_traseira(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.FOTO_PLACA_TRASEIRA).first()
-   verificar_palavras(verificacao, consulta, '{} {}'.format(verificacao.validacao.placa.split('-')))
+   verificar_palavras(verificacao, consulta, '{} {}'.format(*verificacao.validacao.placa.split('-')))
 
 def verificar_itens_seguranca_placa_traseira(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.OCR_PLACA_TRASEIRA).first()
@@ -198,7 +198,7 @@ def verificar_qrcode_placa_traseira(verificacao):
 
 def verificar_numero_segunda_placa_traseira(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.FOTO_SEGUNDA_PLACA_TRASEIRA).first()
-   verificar_palavras(verificacao, consulta, '{} {}'.format(verificacao.validacao.placa.split('-')))
+   verificar_palavras(verificacao, consulta, '{} {}'.format(*verificacao.validacao.placa.split('-')))
 
 def verificar_itens_segunda_seguranca_placa_traseira(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.OCR_SEGUNDA_PLACA_TRASEIRA).first()
