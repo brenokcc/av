@@ -680,7 +680,7 @@ class ConsultaAvulso(models.Model):
         elif self.tipo == 3:
             resultado = google_vision.Service().detect_text(url)
         self.resultado = str(resultado) if resultado is not None else '-'
-        super(*args, **kwargs).save()
+        self.save()
         return self.resultado
 
     @meta('Foto', renderer='images/image')
