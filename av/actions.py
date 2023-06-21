@@ -123,3 +123,6 @@ class CadastrarConsultaAvulso(actions.Action):
     def submit(self):
         self.save()
         self.info('RESULTADO: {}'.format(self.instance.consultar_servico()))
+
+    def has_permission(self, user):
+        return user.roles.contains(ADM) or user.is_superuser
