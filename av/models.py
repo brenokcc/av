@@ -657,7 +657,7 @@ class ConsultaAvulso(models.Model):
     tipo = models.IntegerField(verbose_name='Tipo', choices=TIPO_CHOICES)
     foto = models.PhotoField(verbose_name='Foto')
     data = models.DateTimeField(verbose_name='Data', auto_now_add=True)
-    resultado = models.CharField('Resultado', null=True, blank=True)
+    resultado = models.TextField('Resultado', null=True, blank=True)
 
     objects = ConsultaAvulsoManager()
 
