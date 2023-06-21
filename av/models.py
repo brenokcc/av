@@ -5,6 +5,7 @@ from sloth.db import models, role, meta
 from .roles import ADM
 from django.conf import settings
 from uuid import uuid1
+from av.services import google_vision, google_lens
 
 
 class AdministradorManager(models.Manager):
@@ -222,7 +223,7 @@ class CodigoCor(models.Model):
 
 class ValidacaoManager(models.Manager):
     def all(self):
-        return self.lookups(ADM).display('placa', 'chassi', 'marca', 'cor', 'estampador', 'operador', 'cpf_proprietario', 'nome_proprietario')
+        return self.lookups(ADM).display('id', 'placa', 'chassi', 'marca', 'cor', 'estampador', 'operador', 'cpf_proprietario', 'nome_proprietario').order_by('-id')
 
  
 class Validacao(models.Model):
@@ -633,3 +634,58 @@ class Verificacao(models.Model):
     @meta('Satisfeita', renderer='badges/boolean')
     def get_satisfeita(self):
         return self.satisfeita
+
+
+class ConsultaServicoManager(models.Manager):
+    def all(self):
+        return self
+
+
+class ConsultaAvulsoManager(models.Manager):
+    def all(self):
+        return self.display('get_foto', 'get_tipo', 'data', 'resultado')
+
+
+class ConsultaAvulso(models.Model):
+    TIPO_CHOICES = [
+        (0, 'Foto do Chassi'),
+        (1, 'Foto Dianteira'),
+        (2, 'Foto Traseira'),
+        (3, 'Foto de Documento'),
+    ]
+
+    tipo = models.IntegerField(verbose_name='Tipo', choices=TIPO_CHOICES)
+    foto = models.PhotoField(verbose_name='Foto')
+    data = models.DateTimeField(verbose_name='Data', auto_now_add=True)
+    resultado = models.CharField('Resultado', null=True, blank=True)
+
+    objects = ConsultaAvulsoManager()
+
+    class Meta:
+        verbose_name = 'Consulta Avulso'
+        verbose_name_plural = 'Consultas Avulso'
+
+    def __str__(self):
+        return 'Consulta {} #{}'.format(self.tipo , self.pk)
+
+    def has_permission(self, user):
+        return user.is_superuser
+
+    def consultar_servico(self):
+        url = '{}/media/{}'.format(settings.SITE_URL, self.foto.name)
+        if self.tipo == 0:
+            resultado = google_vision.Service().detect_chassi(url)
+        elif self.tipo in (1, 2):
+            resultado = google_lens.Service().detect_brand(url)
+        elif self.tipo == 3:
+            resultado = google_vision.Service().detect_text(url)
+        self.resultado = str(resultado) if resultado is not None else '-'
+        super(*args, **kwargs).save()
+        return self.resultado
+
+    @meta('Foto', renderer='images/image')
+    def get_foto(self):
+        return self.foto
+
+    def get_tipo(self):
+        return self.TIPO_CHOICES[self.tipo][1]

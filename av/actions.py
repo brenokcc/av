@@ -109,3 +109,17 @@ class InvalidarConsulta(actions.Action):
     def has_permission(self, user):
         return user.is_superuser
 
+
+class CadastrarConsultaAvulso(actions.Action):
+    class Meta:
+        model = 'av.consultaavulso'
+        verbose_name = 'Consulta Avulso'
+        modal = True
+        style = 'primary'
+        fieldsets = {
+            '': ('tipo', 'foto'),
+        }
+
+    def submit(self):
+        self.save()
+        self.info('RESULTADO: {}'.format(self.instance.consultar_servico()))

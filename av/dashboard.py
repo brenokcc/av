@@ -18,6 +18,7 @@ class AppDashboard(Dashboard):
         self.footer(title='© 2022 Sigplac', text='Todos os direitos reservados', version='1.0.0')
 
         self.top_menu('av.fabricante', 'av.marca', 'av.cor', 'av.codigocor', 'av.estampador', 'av.validacao')
+        self._item('links', '/app/dashboard/av/consultaavulso/add/', 'Consulta Avulso', None)
 
     def view(self):
         return self.objects('av.validacao').all().actions('view').global_actions('cadastrar_validacao')
