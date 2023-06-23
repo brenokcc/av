@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name='ConsultaAvulso',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('tipo', models.IntegerField(choices=[(0, 'Foto do Chassi'), (1, 'Foto Dianteira'), (2, 'Foto Traseira'), (3, 'Foto de Documento')], verbose_name='Tipo')),
+                ('tipo', models.IntegerField(choices=[(0, 'Foto do Chassi'), (1, 'Foto Dianteira'), (2, 'Foto Traseira'), (3, 'Foto de Documento'), (4, 'Cor de Veículo')], verbose_name='Tipo')),
                 ('foto', sloth.db.models.PhotoField(upload_to='', verbose_name='Foto')),
                 ('data', models.DateTimeField(auto_now_add=True, verbose_name='Data')),
                 ('resultado', sloth.db.models.CharField(blank=True, max_length=255, null=True, verbose_name='Resultado')),

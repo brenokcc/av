@@ -5,7 +5,7 @@ from sloth.db import models, role, meta
 from .roles import ADM
 from django.conf import settings
 from uuid import uuid1
-from av.services import google_vision, google_lens
+from av.services import google_vision, google_lens, eyedea
 
 
 class AdministradorManager(models.Manager):
@@ -652,6 +652,7 @@ class ConsultaAvulso(models.Model):
         (1, 'Foto Dianteira'),
         (2, 'Foto Traseira'),
         (3, 'Foto de Documento'),
+        (4, 'Cor de Veículo'),
     ]
 
     tipo = models.IntegerField(verbose_name='Tipo', choices=TIPO_CHOICES)
@@ -679,6 +680,8 @@ class ConsultaAvulso(models.Model):
             resultado = google_lens.Service().detect_brand(url)
         elif self.tipo == 3:
             resultado = google_vision.Service().detect_text(url)
+        elif self.tipo == 4:
+            resultado = eyedea.Service().detect_color(url)
         self.resultado = str(resultado) if resultado is not None else '-'
         self.save()
         return self.resultado

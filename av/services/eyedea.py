@@ -11,7 +11,7 @@ service.detect_color(url)
 
 NET_ADDRESS = "https://cloud.eyedea.cz/"
 EMAIL = "brenokcc@yahoo.com.br"
-PASSWORD = os.environ['EYEDEA_PASSWORD']
+PASSWORD = os.environ.get('EYEDEA_PASSWORD')
 
 
 class Service:
