@@ -73,7 +73,7 @@ class Service:
 
     def detect_color(self, uri):
         result = self.detect_colors(uri)
-        return result[0] if result else None
+        return result[0] if result else ''
 
     def test(self):
         url = 'https://av.cloud.aplicativo.click/media/fotos/1685975118796_emRFCt1.png'
