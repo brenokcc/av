@@ -72,7 +72,8 @@ class Service:
         return [item['plate'] for item in self._get_data(uri) if item['plate']]
 
     def detect_color(self, uri):
-        return self.detect_colors(uri)[0]
+        result = self.detect_colors(uri)
+        return result[0] if result else None
 
     def test(self):
         url = 'https://av.cloud.aplicativo.click/media/fotos/1685975118796_emRFCt1.png'
