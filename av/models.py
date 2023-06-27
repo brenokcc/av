@@ -242,11 +242,13 @@ class Validacao(models.Model):
     nome_proprietario = models.CharField('Nome do Proprietário')
     foto_perfil_proprietario = models.PhotoField('Foto de Perfil do Proprietário', null=True, blank=True, upload_to='fotos', max_width=500)
     foto_documento_proprietario = models.PhotoField('Foto do Documento do Proprietário', null=True, blank=True, upload_to='fotos', max_width=800)
+    foto_documento_proprietario_2 = models.PhotoField('Foto do Documento do Proprietário 2', null=True, blank=True, upload_to='fotos', max_width=800)
 
     cpf_representante = models.BrCpfField('CPF do Representante', null=True, blank=True)
     nome_representante = models.CharField('Nome do Representante', null=True, blank=True)
     foto_perfil_representante = models.PhotoField('Foto de Perfil do Representante', null=True, blank=True, upload_to='fotos', max_width=500)
     foto_documento_representante = models.PhotoField('Foto do Documento do Representante', null=True, blank=True, upload_to='fotos', max_width=800)
+    foto_documento_representante_2 = models.PhotoField('Foto do Documento do Representante 2', null=True, blank=True, upload_to='fotos', max_width=800)
     foto_procuracao = models.PhotoField('Foto da Procuração', null=True, blank=True, upload_to='fotos', max_width=800)
 
     foto_chassi_veiculo = models.PhotoField('Foto do Chassi do Veículo', null=True, blank=True, upload_to='fotos', max_width=800)
@@ -505,7 +507,9 @@ class Consulta(models.Model):
     FOTO_OPERADOR = 'Foto do Operador'
     PRESENCA_OPERADOR = 'Presença do Operador'
     DOCUMENTO_PROPRIETARIO = 'Documento do Proprietário'
+    DOCUMENTO_PROPRIETARIO_2 = 'Documento do Proprietário 2'
     DOCUMENTO_REPRESENTANTE = 'Documento do Representante'
+    DOCUMENTO_REPRESENTANTE_2 = 'Documento do Representante 2'
     MARCA_FOTO_DIANTEIRA = 'Marca da Foto Dianteira'
     MARCA_FOTO_TRASEIRA = 'Marca da Foto Traseira'
     FOTO_PROPRIETARIO = 'Foto do Proprietário'
@@ -523,7 +527,9 @@ class Consulta(models.Model):
     CARACTERISTICAS_CHASSI = 'Características do Chassi'
     COR_VEICULO = 'Cor do Veículo'
     PROCURACAO = 'Procuração'
+    ASSINATURA_PROCURACAO = 'Assinatura na Procuração'
     BOLETIM_OCORRENCIA = 'Boletim de Ocorrência'
+    ASSINATURA_BOLETIM_OCORRENCIA = 'Assinatura no Boletim de Ocorrência'
 
     validacao = models.ForeignKey(Validacao, verbose_name='Validação')
     tipo = models.CharField('Tipo')
@@ -609,6 +615,7 @@ class Verificacao(models.Model):
     TITULO_BOLETIM_OCORRENCIA = 'Palavra "BOLETIM DE OCORRÊNCIA" presente no documento do boletim de ocorrência'
     DADOS_PROPRIETARIO_BOLETIM_OCORRENCIA = 'Nome e CPF do representante presente no documento do boletim de ocorrência'
     PLACA_BOLETIM_OCORRENCIA = 'Número da placa presente no documento do boletim de ocorrência'
+    ASSINATURA_BOLETIM_OCORRENCIA = 'Assinatura presente no boletim de ocorrência'
 
     DESCARTE_PLACA_DIANTEIRA = 'Corte na placa dianteira descartada'
     DESCARTE_PLACA_TRASEIRA = 'Corte na placa traseira descartada'
@@ -675,7 +682,10 @@ class ConsultaAvulso(models.Model):
     def consultar_servico(self):
         url = '{}/media/{}'.format(settings.SITE_URL, self.foto.name)
         if self.tipo == 0:
-            resultado = google_vision.Service().detect_chassi(url)
+            resultado = 'NÚMERO: {} CARACTERÍTICAS: {}'.format(
+                google_vision.Service().detect_chassi(url),
+                ', '.join(google_vision.Service().detect_labels(url)),
+            )
         elif self.tipo in (1, 2):
             resultado = google_lens.Service().detect_brand(url)
         elif self.tipo == 3:

@@ -86,10 +86,16 @@ def verificar_presenca_operador(verificacao):
 def verificar_nome_proprietario(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.DOCUMENTO_PROPRIETARIO).first()
    verificar_palavras(verificacao, consulta, verificacao.validacao.nome_proprietario.upper())
+   if not verificacao.satisfeita:
+      consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.DOCUMENTO_PROPRIETARIO_2).first()
+      verificar_palavras(verificacao, consulta, verificacao.validacao.nome_proprietario.upper())
 
 def verificar_cpf_proprietario(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.DOCUMENTO_PROPRIETARIO).first()
-   verificar_palavras(verificacao, consulta, verificacao.validacao.nome_proprietario.upper())
+   verificar_palavras(verificacao, consulta, verificacao.validacao.cpf_proprietario.upper())
+   if not verificacao.satisfeita:
+      consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.DOCUMENTO_PROPRIETARIO_2).first()
+      verificar_palavras(verificacao, consulta, verificacao.validacao.cpf_proprietario.upper())
 
 def verificar_reconhecimento_proprietario(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.FOTO_PROPRIETARIO).first()
@@ -102,11 +108,16 @@ def verificar_presenca_proprietario(verificacao):
 def verificar_nome_representante(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.DOCUMENTO_REPRESENTANTE).first()
    verificar_palavras(verificacao, consulta, verificacao.validacao.nome_representante.upper())
-
+   if not verificacao.satisfeita:
+      consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.DOCUMENTO_REPRESENTANTE_2).first()
+      verificar_palavras(verificacao, consulta, verificacao.validacao.nome_representante.upper())
 
 def verificar_cpf_representante(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.DOCUMENTO_REPRESENTANTE).first()
    verificar_palavras(verificacao, consulta, verificacao.validacao.cpf_representante.upper())
+   if not verificacao.satisfeita:
+      consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.DOCUMENTO_REPRESENTANTE_2).first()
+      verificar_palavras(verificacao, consulta, verificacao.validacao.cpf_representante.upper())
 
 def verificar_reconhecimento_representante(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.FOTO_REPRESENTANTE).first()
@@ -133,7 +144,8 @@ def verificar_placa_procuracao(verificacao):
    verificar_palavras(verificacao, consulta, verificacao.validacao.placa.upper())
 
 def verificar_assinatura_procuracao(verificacao):
-   pass
+   consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.ASSINATURA_PROCURACAO).first()
+   verificar_palavras(verificacao, consulta, 'SIGNATURE HANDWRITING')
 
 def verificar_numero_chassi(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.NUMERO_CHASSI).first()
@@ -141,7 +153,6 @@ def verificar_numero_chassi(verificacao):
    if not verificacao.satisfeita:
       consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.NUMERO_CHASSI_2).first()
       verificar_palavras(verificacao, consulta, verificacao.validacao.chassi)
-
 
 def verificar_caracteristica_chassi(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.CARACTERISTICAS_CHASSI).first()
@@ -166,13 +177,11 @@ def verificar_cor_veiculo(verificacao):
          verificacao.observacao = 'Cor incopatível "{}"'.format(consulta.valor)
       verificacao.save()
 
-
 def calcular_distancia(latitude, longitude):
    coords_1 = (self.latitude, self.longitude)
    coords_2 = (latitude, longitude)
    distancia = geopy.distance.geodesic(coords_1, coords_2)
    return distancia.m
-
 
 def verificar_numero_placa_dianteira(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.FOTO_PLACA_DIANTEIRA).first()
@@ -218,6 +227,10 @@ def verificar_dados_proprietario_boletim_ocorrencia(verificacao):
 def verificar_placa_boletim_ocorrencia(verificacao):
    consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.BOLETIM_OCORRENCIA).first()
    verificar_palavras(verificacao, consulta, verificacao.validacao.placa.upper())
+
+def verificar_assinatura_boletim_ocorrencia(verificacao):
+   consulta = verificacao.validacao.consulta_set.filter(valida=True, tipo=Consulta.ASSINATURA_BOLETIM_OCORRENCIA).first()
+   verificar_palavras(verificacao, consulta, 'SIGNATURE HANDWRITING')
 
 def verificar_descarte_placa_dianteira(verificacao):
    pass
@@ -295,6 +308,8 @@ def realizar_verificacoes(verificacao):
       verificar_dados_proprietario_boletim_ocorrencia(verificacao)
    if verificacao.descricao == Verificacao.PLACA_BOLETIM_OCORRENCIA and not verificacao.satisfeita:
       verificar_placa_boletim_ocorrencia(verificacao)
+   if verificacao.descricao == Verificacao.ASSINATURA_BOLETIM_OCORRENCIA and not verificacao.satisfeita:
+      verificar_assinatura_boletim_ocorrencia(verificacao)
    if verificacao.descricao == Verificacao.DESCARTE_PLACA_DIANTEIRA and not verificacao.satisfeita:
       verificar_descarte_placa_dianteira(verificacao)
    if verificacao.descricao == Verificacao.DESCARTE_PLACA_TRASEIRA and not verificacao.satisfeita:

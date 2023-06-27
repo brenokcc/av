@@ -39,6 +39,17 @@ def consultar_documento_proprietario(validacao):
         consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
         consulta.save()
 
+def consultar_documento_proprietario_2(validacao):
+    url = validacao.get_url('foto_documento_proprietario_2')
+    qs = validacao.consulta_set.filter(tipo=Consulta.DOCUMENTO_PROPRIETARIO_2, valida=True)
+    if url and not qs.filter(url=url).exists():
+        qs.update(valida=False)
+        print('Verificando documento do proprietário 2...')
+        consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
+        consulta.tipo = Consulta.DOCUMENTO_PROPRIETARIO_2
+        consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
+        consulta.save()
+
 def consultar_foto_proprietario(validacao):
     url1 = validacao.get_url('foto_perfil_proprietario')
     url2 = validacao.get_url('foto_documento_proprietario')
@@ -70,6 +81,17 @@ def consultar_documento_representante(validacao):
         print('Verificando documento do representante...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.DOCUMENTO_REPRESENTANTE
+        consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
+        consulta.save()
+
+def consultar_documento_representante_2(validacao):
+    url = validacao.get_url('foto_documento_representante_2')
+    qs = validacao.consulta_set.filter(tipo=Consulta.DOCUMENTO_REPRESENTANTE_2, valida=True)
+    if url and not qs.filter(url=url).exists():
+        qs.update(valida=False)
+        print('Verificando documento do representante 2...')
+        consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
+        consulta.tipo = Consulta.DOCUMENTO_REPRESENTANTE_2
         consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
         consulta.save()
 
@@ -229,6 +251,17 @@ def consultar_procuracao(validacao):
         consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
         consulta.save()
 
+def consultar_assinatura_procuracao(validacao):
+    url = validacao.get_url('foto_procuracao')
+    qs = validacao.consulta_set.filter(tipo=Consulta.ASSINATURA_PROCURACAO, valida=True)
+    if url and not qs.filter(url=url).exists():
+        qs.update(valida=False)
+        print('Verificando assinatura na procuração...')
+        consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
+        consulta.tipo = Consulta.ASSINATURA_PROCURACAO
+        consulta.valor = '{}' if FAKE else json.dumps(google_vision.Service().detect_labels(url)).upper()
+        consulta.save()
+
 
 def consultar_boletim_ocorrencia(validacao):
     url = validacao.get_url('foto_boletim_ocorrencia')
@@ -242,12 +275,26 @@ def consultar_boletim_ocorrencia(validacao):
         consulta.save()
 
 
+def consultar_assinatura_boletim_ocorrencia(validacao):
+    url = validacao.get_url('foto_boletim_ocorrencia')
+    qs = validacao.consulta_set.filter(tipo=Consulta.ASSINATURA_BOLETIM_OCORRENCIA, valida=True)
+    if url and not qs.filter(url=url).exists():
+        qs.update(valida=False)
+        print('Verificando assinatura no boletim de ocorrência...')
+        consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
+        consulta.tipo = Consulta.ASSINATURA_BOLETIM_OCORRENCIA
+        consulta.valor = '{}' if FAKE else google_vision.Service().detect_text(url)
+        consulta.save()
+
+
 def consultar_servicos(validacao):
     consultar_foto_operador(validacao)
     consultar_presenca_operador(validacao)
     consultar_documento_proprietario(validacao)
+    consultar_documento_proprietario_2(validacao)
     consultar_foto_proprietario(validacao)
     consultar_documento_representante(validacao)
+    consultar_documento_representante_2(validacao)
     consultar_foto_representante(validacao)
     consultar_marca_foto_dianteira(validacao)
     consultar_marca_foto_traseira(validacao)
@@ -263,4 +310,6 @@ def consultar_servicos(validacao):
     consultar_presenca_proprietario(validacao)
     consultar_cor_veiculo(validacao)
     consultar_procuracao(validacao)
+    consultar_assinatura_procuracao(validacao)
     consultar_boletim_ocorrencia(validacao)
+    consultar_assinatura_boletim_ocorrencia(validacao)

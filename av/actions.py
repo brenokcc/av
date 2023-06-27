@@ -59,8 +59,8 @@ class EnviarFotos(actions.Action):
         modal = False
         style = 'primary'
         fieldsets = {
-            'Proprietário': ('foto_perfil_proprietario', 'foto_documento_proprietario'),
-            'Representante': ('foto_perfil_representante', 'foto_documento_representante', 'foto_procuracao'),
+            'Proprietário': ('foto_perfil_proprietario', 'foto_documento_proprietario', 'foto_documento_proprietario_2'),
+            'Representante': ('foto_perfil_representante', 'foto_documento_representante', 'foto_documento_representante_2', 'foto_procuracao'),
             'Fotos do Veículo': ('foto_chassi_veiculo', 'foto_dianteira_veiculo', 'foto_traseira_veiculo'),
             'Fotos das Placas': ('qrcode_placa_dianteira', 'qrcode_placa_traseira', 'qrcode_segunda_placa_traseira'),
             'Fotos do Descarte': ('foto_boletim_ocorrencia', 'foto_descarte_placa_dianteira', 'foto_descarte_placa_traseira', 'foto_descarte_segunda_placa_traseira'),
