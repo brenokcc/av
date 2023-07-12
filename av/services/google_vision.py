@@ -16,6 +16,7 @@ placa_moto = 'https://av.cloud.aplicativo.click/media/fotos/1685977179504_PHEGA2
 service.detect_text(placa_moto)
 frente_carro = 'https://av.cloud.aplicativo.click/media/fotos/1685975118796_97NeDBC.png'
 service.detect_text(placa_moto)
+service.detect_color(frente_carro)
 """
 
 class Service():
@@ -59,6 +60,18 @@ class Service():
             if item and 'labelAnnotations' in item:
                 return [value['description'].lower() for value in item['labelAnnotations']]
         return []
+
+    def detect_color(self, uri):
+        image = {"source": {"image_uri": uri}} if uri.startswith('http') else {"content": uri}
+        url = 'https://vision.googleapis.com/v1/images:annotate?key={}'.format(self.token)
+        data = {"requests": [{"image": image, "features": {"type": "IMAGE_PROPERTIES"}}]}
+        response = requests.post(url, json=data).json()
+        print(response)
+        for item in response['responses']:
+            if item and 'imagePropertiesAnnotation' in item:
+                color = item['imagePropertiesAnnotation']['dominantColors']['colors'][0]['color']
+                return tuple(color.values())
+        return (0, 0, 0)
 
     def detect_chassi(self, uri):
         text = self.detect_text(uri).upper()

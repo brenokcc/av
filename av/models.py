@@ -5,7 +5,7 @@ from sloth.db import models, role, meta
 from .roles import ADM
 from django.conf import settings
 from uuid import uuid1
-from av.services import google_vision, google_lens, eyedea
+from av.services import google_vision, google_lens, chat_gpt
 
 
 class AdministradorManager(models.Manager):
@@ -691,7 +691,10 @@ class ConsultaAvulso(models.Model):
         elif self.tipo == 3:
             resultado = google_vision.Service().detect_text(url)
         elif self.tipo == 4:
-            resultado = eyedea.Service().detect_color(url)
+            rgb = google_vision.Service().detect_color(url)
+            pergunta = 'In one word, which color is the RGB code {}'.format(rgb)
+            resultado = chat_gpt.Service().prompt(pergunta).upper()
+
         self.resultado = str(resultado) if resultado is not None else '-'
         self.save()
         return self.resultado
