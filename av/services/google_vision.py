@@ -76,7 +76,7 @@ class Service():
     def detect_chassi(self, uri):
         text = self.detect_text(uri).upper()
         text = ''.join(e for e in text if e.isalnum())
-        text = text.replace('I', '1').replace('O', '0').replace('Q', '0')
+        text = text.replace('I', '1').replace('O', '0').replace('Q', '0').replace('*', '').replace('\n', '').replace('\t', '').replace('#', '').replace(' ', '').replace('~', '')
         return text
 
     def check_words(self, text, words=()):

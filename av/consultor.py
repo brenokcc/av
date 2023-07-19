@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from .services import google_vision, google_lens, face_recognizer, liveness, plate_recognizer, eyedea, vinocr
+from .services import google_vision, google_lens, face_recognizer, liveness, plate_recognizer, eyedea, azure
 from .models import Consulta, Validacao
 
 FAKE = False
@@ -203,7 +203,7 @@ def consultar_numero_chassi(validacao):
         print('Verificando número do chassi...')
         consulta = Consulta(validacao=validacao, data_hora=datetime.now(), url=url)
         consulta.tipo = Consulta.NUMERO_CHASSI
-        consulta.valor = '{}' if FAKE else vinocr.Service().detect_vin(url)
+        consulta.valor = '{}' if FAKE else azure.Service().detect_text(url)
         consulta.save()
 
 def consultar_numero_chassi2(validacao):

@@ -5,7 +5,7 @@ from sloth.db import models, role, meta
 from .roles import ADM
 from django.conf import settings
 from uuid import uuid1
-from av.services import google_vision, google_lens, chat_gpt
+from av.services import google_vision, google_lens, chat_gpt, azure
 
 
 class AdministradorManager(models.Manager):
@@ -682,8 +682,9 @@ class ConsultaAvulso(models.Model):
     def consultar_servico(self):
         url = '{}/media/{}'.format(settings.SITE_URL, self.foto.name)
         if self.tipo == 0:
-            resultado = 'NÚMERO: {} CARACTERÍTICAS: {}'.format(
+            resultado = 'NÚMERO: {} ou {} CARACTERÍTICAS: {}'.format(
                 google_vision.Service().detect_chassi(url),
+                azure.Service().detect_chassi(url),
                 ', '.join(google_vision.Service().detect_labels(url)),
             )
         elif self.tipo in (1, 2):
