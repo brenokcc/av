@@ -1,6 +1,6 @@
 import tempfile
 import requests
-from PIL import Image
+#from PIL import Image
 
 """
 from av.services.liveness import Service

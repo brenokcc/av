@@ -45,7 +45,7 @@ class CadastrarValidacao(actions.Action):
 
     def submit(self):
         super().submit()
-        self.redirect('/app/dashboard/{}/'.format(self.instance.pk))
+        self.redirect('/app/dashboard/av/validacao/{}/'.format(self.instance.pk))
 
     def has_permission(self, user):
         return user.roles.contains(ADM) or user.is_superuser

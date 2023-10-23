@@ -21,5 +21,5 @@ class AppDashboard(Dashboard):
         self._item('links', '/app/dashboard/av/consultaavulso/add/', 'Consulta Avulso', None)
 
     def view(self):
-        return self.objects('av.validacao').all().actions('view').global_actions('cadastrar_validacao')
+        return self.objects('av.validacao').all()
 
